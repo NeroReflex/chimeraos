@@ -44,7 +44,7 @@ mkdir -p ${MOUNT_PATH}
 
 fallocate -l ${SIZE} ${BUILD_IMG}
 mkfs.btrfs -f ${BUILD_IMG}
-mount -t btrfs -o loop,nodatacow ${BUILD_IMG} ${MOUNT_PATH}
+mount -t btrfs -o loop,compress-force=zstd:15 ${BUILD_IMG} ${MOUNT_PATH}
 btrfs subvolume create ${BUILD_PATH}
 
 # copy the makepkg.conf into chroot
@@ -163,10 +163,10 @@ rm /etc/chimeraos_logo.png
 #pacman -Rs --noconfirm mkinitcpio ${KERNEL_PACKAGE} ${KERNEL_PACKAGE}-headers systemd-ukify
 
 echo "
-LABEL=frzr_root /var				btrfs	rw,subvolid=256,noatime 0 0
-LABEL=frzr_root /home				btrfs	rw,subvolid=257,noatime,nodatacow 0 0
-LABEL=frzr_root /frzr_root 			btrfs	rw,subvolid=5,noatime 0 0
-overlay 		/etc	 			overlay	noauto,x-systemd.automount,lowerdir=/etc,upperdir=/frzr_root/etc,workdir=/frzr_root/.etc 0 0
+LABEL=frzr_root /var       btrfs     defaults,subvolid=256,rw,noatime,nodatacow                                                                           0   0
+LABEL=frzr_root /home      btrfs     defaults,subvolid=257,rw,noatime,nodatacow                                                                           0   0
+LABEL=frzr_root /frzr_root btrfs     defaults,subvolid=5,rw,noatime,nodatacow,x-initrd                                                                    0   2
+overlayfs       /etc       overlayfs defaults,x-depends-on=/frzr_root,lowerdir=/etc,upperdir=/frzr_root/etc,workdir=/frzr_root/.etc,comment=etcoverlay    0   2
 " > /etc/fstab
 
 echo "
@@ -219,11 +219,14 @@ rm -rf \
 rm -rf ${FILES_TO_DELETE}
 
 # create necessary directories
-mkdir /home
-mkdir /var
-mkdir /frzr_root
-mkdir /efi
+mkdir -p /home
+mkdir -p /var
+mkdir -p /frzr_root
+mkdir -p /efi
 EOF
+
+#defrag the image
+btrfs filesystem defragment -r ${BUILD_PATH}
 
 # copy files into chroot again
 cp -R rootfs/. ${BUILD_PATH}/
