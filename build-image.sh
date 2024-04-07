@@ -201,15 +201,15 @@ rm -rf \
 /extra_pkgs \
 /extra_certs \
 /home \
-/var \
+/var/log \
 
 rm -rf ${FILES_TO_DELETE}
 
 # create necessary directories
 mkdir -p /home
-mkdir -p /var
 mkdir -p /frzr_root
 mkdir -p /efi
+mkdir -p /var/log
 EOF
 
 #defrag the image
