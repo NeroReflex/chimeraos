@@ -1,0 +1,47 @@
+# Create the /etc and /var overlay
+post_install() {
+    local MOUNT_PATH=$1
+    local SUBVOL=$2
+    local NAME=$3
+
+    # set deployment subvol RW
+    btrfs property set -fts "${SUBVOL}" ro false
+
+    if [ -d /sysroot ]; then
+        local sysroot_snapshot="y"
+        
+        echo "Import current /etc and /var overlays to the new deployment..."
+        btrfs snapshot "/sysroot" "${SUBVOL}/sysroot"
+
+        echo "Setting the overlay as RW..."
+        btrfs property set -fts "${SUBVOL}/sysroot" ro false
+    else
+        echo "No /sysroot found: creating the overlay"
+        # prepare /etc and /var overlays
+        btrfs subvol create "${SUBVOL}/sysroot"
+    fi
+
+    echo "Ensuring overlay can be mounted at next boot"
+    mkdir -p "${SUBVOL}/sysroot/etc_overlay/upperdir"
+    mkdir -p "${SUBVOL}/sysroot/etc_overlay/workdir"
+    mkdir -p "${SUBVOL}/sysroot/var_overlay/upperdir"
+    mkdir -p "${SUBVOL}/sysroot/var_overlay/workdir"
+
+    if [ -d "${MOUNT_PATH}/etc" ] && [ -z $sysroot_snapshot ]; then
+        echo "Cloning the /etc overlay upperdir from '${MOUNT_PATH}/etc/' to '${SUBVOL}/sysroot/etc_overlay/upperdir'..."
+        cp -a ${MOUNT_PATH}/etc/* "${SUBVOL}/sysroot/etc_overlay/upperdir/"
+    fi
+
+    if [ -d "${MOUNT_PATH}/.etc" ] && [ -z $sysroot_snapshot ]; then
+        echo "Cloning the /etc overlay workdir from '${MOUNT_PATH}/.etc/' to '${SUBVOL}/sysroot/etc_overlay/workdir'..."
+        cp -a ${MOUNT_PATH}/.etc/* "${SUBVOL}/sysroot/etc_overlay/workdir/"
+    fi
+
+    if [ -d "${MOUNT_PATH}/var" ] && [ -z $sysroot_snapshot ]; then
+        echo "Transforming the /var subolume in '${MOUNT_PATH}/var/' to an overlay upperdir in '${SUBVOL}/sysroot/var_overlay/upperdir'..."
+        cp -a ${MOUNT_PATH}/var/* "${SUBVOL}/sysroot/var_overlay/upperdir/"
+    fi
+
+    # set deployment subvol back to RO
+    btrfs property set -fts "${SUBVOL}" ro true
+}
