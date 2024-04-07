@@ -1,0 +1,31 @@
+# Create the /etc and /var overlay
+post_install() {
+    local MOUNT_PATH=$1
+    local SUBVOL=$2
+    local NAME=$3
+
+    # set deployment subvol RW
+    btrfs property set -fts "${SUBVOL}" ro false
+
+    # prepare /etc and /var overlays
+    btrfs subvol create "${SUBVOL}/sysroot"
+    mkdir -p "${SUBVOL}/sysroot/etc_overlay/upperdir"
+    mkdir -p "${SUBVOL}/sysroot/etc_overlay/workdir"
+    mkdir -p "${SUBVOL}/sysroot/etc_overlay/upperdir"
+    mkdir -p "${SUBVOL}/sysroot/etc_overlay/workdir"
+
+    if [ -d "${MOUNT_PATH}/etc" ]; then
+        cp -a ${MOUNT_PATH}/etc/* "${SUBVOL}/sysroot/etc_overlay/upperdir/"
+    fi
+
+    if [ -d "${MOUNT_PATH}/.etc" ]; then
+        cp -a ${MOUNT_PATH}/.etc/* "${SUBVOL}/sysroot/etc_overlay/workdir/"
+    fi
+
+    if [ -d "${MOUNT_PATH}/var" ]; then
+        cp -a ${MOUNT_PATH}/var/* "${SUBVOL}/sysroot/var_overlay/upperdir/"
+    fi
+
+    # set deployment subvol back to RO
+    btrfs property set -fts "${SUBVOL}" ro true
+}
