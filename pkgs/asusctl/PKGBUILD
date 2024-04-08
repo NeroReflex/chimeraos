@@ -7,7 +7,7 @@ pkgdesc="Asus laptop control utilities"
 arch=('x86_64')
 url="https://gitlab.com/asus-linux/asusctl"
 license=('MPL2')
-depends=('libusb' 'udev' 'systemd' 'seatd')
+depends=('libusb' 'udev' 'systemd' 'seatd' 'libinput')
 optdepends=(
 	'libappindicator-gtk3: tray icon'
 	'gtk3: control center ui'
