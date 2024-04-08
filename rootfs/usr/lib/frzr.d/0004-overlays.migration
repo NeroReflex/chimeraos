@@ -42,6 +42,11 @@ post_install() {
         cp -a ${MOUNT_PATH}/var/* "${SUBVOL}/sysroot/var_overlay/upperdir/"
     fi
 
+    if [ -d "${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman" ]; then
+        echo "Clearing up pacman old database overlay in '${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman'..."
+        rm -rf "${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman"
+    fi
+
     # set deployment subvol back to RO
     btrfs property set -fts "${SUBVOL}" ro true
 }
