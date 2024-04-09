@@ -1,6 +1,6 @@
 pkgname=powerstation-asus-radical-git
 _pkgbase=powerstation
-pkgver=v0.2.2.r10.g052ae19
+pkgver=v0.2.2.r11.g2205d33
 pkgrel=1
 pkgdesc="Open source performance daemon with DBus interface"
 arch=('x86_64')
