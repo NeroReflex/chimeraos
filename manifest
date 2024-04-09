@@ -216,6 +216,7 @@ export AUR_PACKAGES="\
 	opengamepadui-session-git \
 	pikaur \
 	python-vdf \
+	powerstation-bin \
 	r8152-dkms \
 	retroarch-autoconfig-udev-git \
 	rtl8812au-dkms-git \
