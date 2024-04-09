@@ -46,7 +46,6 @@ post_install() {
         cp -a "${MOUNT_PATH}/var" "${SUBVOL}/sysroot/var_overlay/"
         rm -rf "${SUBVOL}/sysroot/var_overlay/upperdir"
         mv "${SUBVOL}/sysroot/var_overlay/var" "${SUBVOL}/sysroot/var_overlay/upperdir"
-        mkdir "${SUBVOL}/sysroot/var_overlay/workdir"
     fi
 
     if [ -d "${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman" ]; then
