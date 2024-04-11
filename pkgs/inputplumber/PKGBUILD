@@ -9,6 +9,7 @@ url="https://github.com/ShadowBlip/InputPlumber"
 license=('GPL')
 depends=('dbus' 'libevdev' 'libiio')
 makedepends=('rust' 'make' 'cmake' 'clang' 'git' 'pkg-config')
+options=(!lto)
 provides=('inputplumber')
 conflicts=('inputplumber-bin')
 source=("https://github.com/ShadowBlip/InputPlumber/archive/refs/heads/shadowapex/dualsense.zip")
