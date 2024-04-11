@@ -48,6 +48,7 @@ export PACKAGES="\
 	gnome-control-center \
 	gnome-disk-utility \
 	gnome-keyring \
+	gnome-menus \
 	gnome-session \
 	gnome-shell \
 	gnome-software \
@@ -162,8 +163,8 @@ export PACKAGES="\
 "
 
 export PACKAGE_OVERRIDES="\
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.8.2-chos1-1/linux-chimeraos-6.8.2.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.8.2-chos1-1/linux-chimeraos-headers-6.8.2.chos1-1-x86_64.pkg.tar.zst \
+	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.8.5-chos1-1/linux-chimeraos-6.8.5.chos1-1-x86_64.pkg.tar.zst \
+	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.8.5-chos1-1/linux-chimeraos-headers-6.8.5.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.0.4-chos1-1/lib32-libva-mesa-driver-1--24.0.4.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.0.4-chos1-1/lib32-mesa-1--24.0.4.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.0.4-chos1-1/lib32-mesa-vdpau-1--24.0.4.chos1-1-x86_64.pkg.tar.zst \
@@ -200,8 +201,8 @@ export AUR_PACKAGES="\
 	frzr \
 	gamescope-session-steam-git \
 	gamescope-session-steam-plus-git \
-	handygccs-git \
 	hhfc-git \
+	inputplumber-bin \
 	legendary \
 	lib32-gamescope-plus \
 	lib32-gperftools \
@@ -236,9 +237,9 @@ export SERVICES="\
 	bluetooth \
 	bluetooth-workaround \
 	fstrim.timer \
-	handycon \
 	haveged \
 	home-swapfile.swap \
+	inputplumber \
 	lightdm \
 	powerstation \
 	sshd \
@@ -265,6 +266,9 @@ export FILES_TO_DELETE="\
 "
 
 postinstallhook() {
+	# use nftables instead of the deprecated iptables
+	yes | pacman -S iptables-nft
+
 	# Add sudo permissions
 	sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^# //g' /etc/sudoers
 	echo "${USERNAME} ALL=(ALL) NOPASSWD: /usr/bin/dmidecode -t 11
