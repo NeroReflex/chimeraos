@@ -43,14 +43,15 @@ post_install() {
 
     if [ -d "${MOUNT_PATH}/var" ] && [ -z $sysroot_snapshot ]; then
         echo "Transforming the /var subolume in '${MOUNT_PATH}/var/' to an overlay upperdir in '${SUBVOL}/sysroot/var_overlay/upperdir'..."
-        cp -a "${MOUNT_PATH}/var" "${SUBVOL}/sysroot/var_overlay/"
-        rm -rf "${SUBVOL}/sysroot/var_overlay/upperdir"
-        mv "${SUBVOL}/sysroot/var_overlay/var" "${SUBVOL}/sysroot/var_overlay/upperdir"
+        mount -t overlay overlay -o lowerdir="${SUBVOL}/var",upperdir="${SUBVOL}/sysroot/var_overlay/upperdir",workdir="${SUBVOL}/sysroot/var_overlay/workdir" "${SUBVOL}/var"
+        cp -a "${MOUNT_PATH}/var/*" "${SUBVOL}/var"
+        umount "${SUBVOL}/var"
     fi
 
-    if [ -d "${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman" ]; then
-        echo "Clearing up pacman old database overlay in '${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman'..."
-        rm -rf "${SUBVOL}/sysroot/etc_overlay/upperdir/lib/pacman"
+    # clear out old pacman database
+    if [ -d "${SUBVOL}/sysroot/var_overlay/upperdir/lib/pacman" ]; then
+        echo "Clearing up pacman old database overlay in '${SUBVOL}/sysroot/var_overlay/upperdir/lib/pacman'..."
+        rm -rf "${SUBVOL}/sysroot/var_overlay/upperdir/lib/pacman"
     fi
 
     # set deployment subvol back to RO
