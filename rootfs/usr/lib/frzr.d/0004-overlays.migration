@@ -11,7 +11,7 @@ post_install() {
         local sysroot_snapshot="y"
         
         echo "Import current /etc and /var overlays to the new deployment..."
-        btrfs snapshot "/sysroot" "${SUBVOL}/sysroot"
+        btrfs subvolume snapshot "/sysroot" "${SUBVOL}/sysroot"
 
         echo "Setting the overlay as RW..."
         btrfs property set -fts "${SUBVOL}/sysroot" ro false
