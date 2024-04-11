@@ -1,0 +1,43 @@
+# Maintainer: William Edwards <shadowapex@gmail.com>
+pkgname=inputplumber-git
+_pkgbase=inputplumber
+pkgver=46_e98ae73.r10.g4853589
+pkgrel=1
+pkgdesc="Open source input router and remapper daemon for Linux"
+arch=('x86_64')
+url="https://github.com/ShadowBlip/InputPlumber"
+license=('GPL')
+depends=('dbus' 'libevdev' 'libiio')
+makedepends=('rust' 'make' 'cmake' 'clang' 'git')
+provides=('inputplumber')
+conflicts=('inputplumber-bin')
+source=("https://github.com/ShadowBlip/InputPlumber/archive/refs/heads/shadowapex/dualsense.zip")
+
+sha256sums=('SKIP')
+
+pkgver() {
+    if [ -d "$srcdir/InputPlumber-shadowapex-dualsense" ]; then
+        mv "$srcdir/InputPlumber-shadowapex-dualsense" "$srcdir/${_pkgbase}"
+    fi
+
+	cd "$srcdir/${_pkgbase}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+    if [ -d "$srcdir/InputPlumber-shadowapex-dualsense" ]; then
+        mv "$srcdir/InputPlumber-shadowapex-dualsense" "$srcdir/${_pkgbase}"
+    fi
+    
+	cd "$srcdir/${_pkgbase}"
+}
+
+build() {
+	cd "$srcdir/${_pkgbase}"
+	make build
+}
+
+package() {
+	cd "$srcdir/${_pkgbase}"
+	make install PREFIX=${pkgdir}/usr NO_RELOAD=true
+}

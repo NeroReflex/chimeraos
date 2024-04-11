@@ -202,7 +202,6 @@ export AUR_PACKAGES="\
 	gamescope-session-steam-git \
 	gamescope-session-steam-plus-git \
 	hhfc-git \
-	inputplumber-bin \
 	legendary \
 	lib32-gamescope-plus \
 	lib32-gperftools \
@@ -217,7 +216,6 @@ export AUR_PACKAGES="\
 	opengamepadui-session-git \
 	pikaur \
 	python-vdf \
-	powerstation-bin \
 	r8152-dkms \
 	retroarch-autoconfig-udev-git \
 	rtl8812au-dkms-git \
