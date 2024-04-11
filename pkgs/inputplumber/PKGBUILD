@@ -15,14 +15,14 @@ source=("https://github.com/ShadowBlip/InputPlumber/archive/refs/heads/shadowape
 
 sha256sums=('SKIP')
 
-pkgver() {
-    if [ -d "$srcdir/InputPlumber-shadowapex-dualsense" ]; then
-        mv "$srcdir/InputPlumber-shadowapex-dualsense" "$srcdir/${_pkgbase}"
-    fi
-
-	cd "$srcdir/${_pkgbase}"
-	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
-}
+#pkgver() {
+#    if [ -d "$srcdir/InputPlumber-shadowapex-dualsense" ]; then
+#        mv "$srcdir/InputPlumber-shadowapex-dualsense" "$srcdir/${_pkgbase}"
+#    fi
+#
+#	cd "$srcdir/${_pkgbase}"
+#	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+#}
 
 prepare() {
     if [ -d "$srcdir/InputPlumber-shadowapex-dualsense" ]; then
