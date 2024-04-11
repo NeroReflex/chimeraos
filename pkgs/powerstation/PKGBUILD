@@ -1,34 +1,37 @@
 pkgname=powerstation-asus-radical-git
 _pkgbase=powerstation
-pkgver=v0.2.2.r11.g2205d33
+pkgver=v0.2.2.r16.gfd43cf9
 pkgrel=1
 pkgdesc="Open source performance daemon with DBus interface"
 arch=('x86_64')
 url="https://github.com/Radiicall/PowerStation"
 license=('GPL')
 depends=('dbus' 'pciutils')
-makedepends=('rust' 'make' 'cmake' 'clang' 'git')
+makedepends=('rust' 'make' 'cmake' 'clang' 'git' 'lld')
 provides=('powerstation')
 conflicts=('powerstation-bin' 'powerstation-git')
-source=("${_pkgbase}::git+https://github.com/Radiicall/${_pkgbase}.git#branch=asus")
+source=(
+    "powerstation"
+    "org.shadowblip.PowerStation.conf"
+    "powerstation.service"
+)
 
-sha256sums=('SKIP')
-
-pkgver() {
-    cd "$srcdir/${_pkgbase}"
-    git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
-}
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'    
+)
 
 prepare() {
-    cd "$srcdir/${_pkgbase}"
+    cd "$srcdir/"
 }
 
 build() {
-    cd "$srcdir/${_pkgbase}"
-    make build
+    cd "$srcdir/"
 }
 
 package() {
-    cd "$srcdir/${_pkgbase}"
-    make install PREFIX=${pkgdir}/usr NO_RELOAD=true
+    install -D -m 755 "$srcdir/powerstation" "${pkgdir}/usr/bin/powerstation"
+	install -D -m 644 "$srcdir/org.shadowblip.PowerStation.conf" "${pkgdir}/usr/share/dbus-1/system.d/org.shadowblip.PowerStation.conf"
+	install -D -m 644 "$srcdir/powerstation.service" "${pkgdir}/usr/lib/systemd/system/powerstation.service"
 }
