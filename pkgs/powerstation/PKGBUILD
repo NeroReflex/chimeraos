@@ -1,6 +1,6 @@
 pkgname=powerstation-asus-radical-git
 _pkgbase=powerstation
-pkgver=v0.2.2.r11.g2205d33
+pkgver=v0.2.2.r16.gfd43cf9
 pkgrel=1
 pkgdesc="Open source performance daemon with DBus interface"
 arch=('x86_64')
@@ -8,6 +8,7 @@ url="https://github.com/Radiicall/PowerStation"
 license=('GPL')
 depends=('dbus' 'pciutils')
 makedepends=('rust' 'make' 'cmake' 'clang' 'git')
+options=(!lto)
 provides=('powerstation')
 conflicts=('powerstation-bin' 'powerstation-git')
 source=("${_pkgbase}::git+https://github.com/Radiicall/${_pkgbase}.git#branch=asus")
