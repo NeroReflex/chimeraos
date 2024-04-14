@@ -12,7 +12,7 @@ makedepends=('rust' 'make' 'cmake' 'clang' 'git' 'pkg-config')
 options=(!lto)
 provides=('inputplumber')
 conflicts=('inputplumber-bin')
-source=("https://github.com/ShadowBlip/InputPlumber/archive/refs/heads/shadowapex/dualsense.zip")
+source=("git+https://github.com/ShadowBlip/InputPlumber.git?branch=main")
 
 sha256sums=('SKIP')
 
@@ -26,8 +26,8 @@ sha256sums=('SKIP')
 #}
 
 prepare() {
-    if [ -d "$srcdir/InputPlumber-shadowapex-dualsense" ]; then
-        mv "$srcdir/InputPlumber-shadowapex-dualsense" "$srcdir/${_pkgbase}"
+    if [ -d "$srcdir/InputPlumber" ]; then
+        mv "$srcdir/InputPlumber" "$srcdir/${_pkgbase}"
     fi
     
 	cd "$srcdir/${_pkgbase}"
