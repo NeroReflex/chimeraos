@@ -151,9 +151,9 @@ Subsystem	sftp	/usr/lib/ssh/sftp-server
 " > /etc/ssh/sshd_config
 
 echo "
-LABEL=frzr_root /home      btrfs     defaults,subvolid=257,rw,noatime,nodatacow,nofail                                                                                                                                                     0   0
-overlay         /etc       overlay   defaults,x-initrd.mount,x-systemd.requires=/,x-systemd.rw-only,lowerdir=/etc,upperdir=/sysroot/etc_overlay/upperdir,workdir=/sysroot/etc_overlay/workdir,index=off,metacopy=off,comment=etcoverlay    0   0
-overlay         /var       overlay   defaults,x-initrd.mount,x-systemd.requires=/,x-systemd.rw-only,lowerdir=/var,upperdir=/sysroot/var_overlay/upperdir,workdir=/sysroot/var_overlay/workdir,index=off,metacopy=off,comment=varoverlay    0   0
+LABEL=frzr_root /home      btrfs     defaults,subvolid=257,rw,noatime,nodatacow,nofail                                                                                                                                                        0   0
+overlay         /etc       overlay   defaults,x-initrd.mount,x-systemd.rw-only,lowerdir=/sysroot/etc,upperdir=/sysroot/sysroot/etc_overlay/upperdir,workdir=/sysroot/sysroot/etc_overlay/workdir,index=off,metacopy=off,comment=etcoverlay    0   0
+overlay         /var       overlay   defaults,x-initrd.mount,x-systemd.rw-only,lowerdir=/sysroot/var,upperdir=/sysroot/sysroot/var_overlay/upperdir,workdir=/sysroot/sysroot/var_overlay/workdir,index=off,metacopy=off,comment=varoverlay    0   0
 " > /etc/fstab
 
 echo "
