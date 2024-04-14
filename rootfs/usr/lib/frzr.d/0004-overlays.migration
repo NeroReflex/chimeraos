@@ -1,4 +1,7 @@
 # Create the /etc and /var overlay
+
+frzr_migration_version=1
+
 post_install() {
     local MOUNT_PATH=$1
     local SUBVOL=$2
