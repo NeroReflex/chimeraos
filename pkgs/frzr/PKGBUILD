@@ -1,0 +1,31 @@
+# Maintainer: Alesh Slovak <aleshslovak@gmail.com>
+
+pkgname=frzr-git
+pkgver=0.20.2
+pkgrel=1
+pkgdesc="A deployment and update system for read-only btrfs subvolume based operating systems"
+arch=('any')
+url="https://github.com/NeroReflex/frzr"
+license=('MIT')
+depends=('btrfs-progs' 'parted' 'libnewt' 'dosfstools' 'jq' 'util-linux' 'zstd' 'xz' 'mkinitcpio')
+source=("$pkgname-$pkgver.zip::https://github.com/NeroReflex/frzr/archive/refs/heads/refactor.zip")
+sha256sums=('SKIP')
+
+package() {
+    if [ -d "$srcdir/frzr-refactor" ]; then
+        mv "$srcdir/frzr-refactor" "$srcdir/frzr-$pkgver"
+    fi
+
+    mkdir -p "$pkgdir/usr/bin"
+    mkdir -p "$pkgdir/etc/systemd/system"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-bootstrap" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-deploy" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/__frzr-deploy" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-release" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-unlock" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-initramfs" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-tweaks" "$pkgdir/usr/bin"
+    install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.service" "$pkgdir/etc/systemd/system"
+    install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.timer" "$pkgdir/etc/systemd/system"
+}
+
