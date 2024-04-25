@@ -22,6 +22,7 @@ package() {
     install -m 755 "$srcdir/frzr-$pkgver/frzr-deploy" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/__frzr-debug" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr-deploy" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-release" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-unlock" "$pkgdir/usr/bin"
