@@ -151,9 +151,10 @@ Subsystem	sftp	/usr/lib/ssh/sftp-server
 " > /etc/ssh/sshd_config
 
 echo "
-LABEL=frzr_root /home      btrfs     defaults,subvolid=257,rw,noatime,nodatacow,nofail                                                                                                                                                        0   0
-overlay         /etc       overlay   defaults,x-initrd.mount,x-systemd.rw-only,lowerdir=/sysroot/etc,upperdir=/sysroot/sysroot/etc_overlay/upperdir,workdir=/sysroot/sysroot/etc_overlay/workdir,index=off,metacopy=off,comment=etcoverlay    0   0
-overlay         /var       overlay   defaults,x-initrd.mount,x-systemd.rw-only,lowerdir=/sysroot/var,upperdir=/sysroot/sysroot/var_overlay/upperdir,workdir=/sysroot/sysroot/var_overlay/workdir,index=off,metacopy=off,comment=varoverlay    0   0
+LABEL=frzr_root /frzr_root btrfs     defaults,x-initrd.mount,subvolid=5,rw,noatime,nodatacow                                                                                                                                                                                                                                                                                                                                      0   2
+LABEL=frzr_root /home      btrfs     defaults,subvolid=257,rw,noatime,nodatacow,nofail                                                                                                                                                                                                                                                                                                                                            0   0
+overlay         /etc       overlay   defaults,x-systemd.requires-mounts-for=/frzr_root,x-systemd.requires-mounts-for=/sysroot/frzr_root,x-initrd.mount,x-systemd.rw-only,lowerdir=/sysroot/etc,upperdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/etc_overlay/upperdir,workdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/etc_overlay/workdir,index=off,metacopy=off,comment=etcoverlay    0   0
+overlay         /var       overlay   defaults,x-systemd.requires-mounts-for=/frzr_root,x-systemd.requires-mounts-for=/sysroot/frzr_root,x-initrd.mount,x-systemd.rw-only,lowerdir=/sysroot/var,upperdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/var_overlay/upperdir,workdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/var_overlay/workdir,index=off,metacopy=off,comment=varoverlay    0   0
 " > /etc/fstab
 
 echo "
@@ -186,13 +187,17 @@ pacman -Q > /manifest
 
 # preserve installed package database
 mkdir -p /usr/var/lib/pacman
-cp -r /var/lib/pacman/local /usr/var/lib/pacman/
+cp -a /var/lib/pacman/local /usr/var/lib/pacman/
+
+# Remove the fallback: it is never used and takes up space
+if [ -e "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img" ]; then
+	rm "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img"
+fi
 
 # move kernel image and initrd to a defualt location if "linux" is not used
 if [ ${KERNEL_PACKAGE} != 'linux' ] ; then
 	mv /boot/vmlinuz-${KERNEL_PACKAGE} /boot/vmlinuz-linux
 	mv /boot/initramfs-${KERNEL_PACKAGE}.img /boot/initramfs-linux.img
-	mv /boot/initramfs-${KERNEL_PACKAGE}-fallback.img /boot/initramfs-linux-fallback.img
 fi
 
 # clean up/remove unnecessary files
@@ -210,6 +215,7 @@ mkdir -p /home
 mkdir -p /frzr_root
 mkdir -p /efi
 mkdir -p /var/log
+mkdir -p /deployment_data
 EOF
 
 #defrag the image
