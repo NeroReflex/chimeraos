@@ -17,6 +17,7 @@ package() {
     fi
 
     mkdir -p "$pkgdir/usr/bin"
+    mkdir -p "$pkgdir/usr/lib/frzr"
     mkdir -p "$pkgdir/usr/lib/systemd/system"
     install -m 755 "$srcdir/frzr-$pkgver/frzr" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr" "$pkgdir/usr/bin"
