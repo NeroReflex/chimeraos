@@ -7,6 +7,8 @@ post_install() {
     local SUBVOL=$2
     local NAME=$3
 
+    mkdir -p "${MOUNT_PATH}/kernels"
+
     DEPLOYMENT_DATA="${MOUNT_PATH}/deployments_data"
     SUBVOL_DATA="${DEPLOYMENT_DATA}/${NAME}"
 
@@ -26,16 +28,16 @@ post_install() {
 
         echo "Setting the overlay as RW..."
         btrfs property set -fts "${SUBVOL_DATA}" ro false
+
+        # clear the old /usr overlay
+        if [ -d "${SUBVOL_DATA}/usr_overlay" ]; then
+            rmdir "${SUBVOL_DATA}/usr_overlay"
+        fi
     else
         echo "No previous overlay found: creating the overlay"
 
         # prepare for /etc, /var and /usr overlays
         btrfs subvol create "${SUBVOL_DATA}"
-
-        # clear the old /usr overlay
-        if [ -d "${SUBVOL_DATA}/usr_overlay" ]; then
-            rm -rf "${SUBVOL_DATA}/usr_overlay"
-        fi
     fi
 
     echo "Ensuring overlay can be mounted at next boot"
@@ -43,8 +45,13 @@ post_install() {
     mkdir -p "${SUBVOL_DATA}/etc_overlay/workdir"
     mkdir -p "${SUBVOL_DATA}/var_overlay/upperdir"
     mkdir -p "${SUBVOL_DATA}/var_overlay/workdir"
+    btrfs subvol create "${SUBVOL_DATA}/usr_overlay"
     mkdir -p "${SUBVOL_DATA}/usr_overlay/upperdir"
     mkdir -p "${SUBVOL_DATA}/usr_overlay/workdir"
+
+    # TODO: here mount (and immediatly umount) the /usr overlay
+
+    btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
 
     if [ -d "${MOUNT_PATH}/etc" ] && [ -z $sysroot_snapshot ]; then
         echo "Cloning the /etc overlay upperdir from '${MOUNT_PATH}/etc/' to '${SUBVOL_DATA}/etc_overlay/upperdir'..."
