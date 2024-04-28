@@ -31,7 +31,7 @@ post_install() {
 
         # clear the old /usr overlay
         if [ -d "${SUBVOL_DATA}/usr_overlay" ]; then
-            rmdir "${SUBVOL_DATA}/usr_overlay"
+            rm -rf "${SUBVOL_DATA}/usr_overlay"
         fi
     else
         echo "No previous overlay found: creating the overlay"
