@@ -33,10 +33,15 @@ post_install() {
         if [ -d "${SUBVOL_DATA}/usr_overlay" ]; then
             rm -rf "${SUBVOL_DATA}/usr_overlay"
         fi
+
+        # clear the old /boot overlay
+        if [ -d "${SUBVOL_DATA}/boot_overlay" ]; then
+            rm -rf "${SUBVOL_DATA}/boot_overlay"
+        fi
     else
         echo "No previous overlay found: creating the overlay"
 
-        # prepare for /etc, /var and /usr overlays
+        # prepare for /etc, /var, /usr and /boot overlays
         btrfs subvol create "${SUBVOL_DATA}"
     fi
 
@@ -48,6 +53,9 @@ post_install() {
     btrfs subvol create "${SUBVOL_DATA}/usr_overlay"
     mkdir -p "${SUBVOL_DATA}/usr_overlay/upperdir"
     mkdir -p "${SUBVOL_DATA}/usr_overlay/workdir"
+    btrfs subvol create "${SUBVOL_DATA}/boot_overlay"
+    mkdir -p "${SUBVOL_DATA}/boot_overlay/upperdir"
+    mkdir -p "${SUBVOL_DATA}/boot_overlay/workdir"
 
     # TODO: here mount (and immediatly umount) the /usr overlay
 
