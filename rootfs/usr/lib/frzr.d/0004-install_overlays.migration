@@ -9,6 +9,7 @@ post_install() {
 
     mkdir -p "${MOUNT_PATH}/kernels"
 
+    # check 0001-unlock_overlays.migration
     DEPLOYMENT_DATA="${MOUNT_PATH}/deployments_data"
     SUBVOL_DATA="${DEPLOYMENT_DATA}/${NAME}"
 
