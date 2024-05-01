@@ -51,15 +51,16 @@ post_install() {
     mkdir -p "${SUBVOL_DATA}/var_overlay/upperdir"
     mkdir -p "${SUBVOL_DATA}/var_overlay/workdir"
     btrfs subvol create "${SUBVOL_DATA}/usr_overlay"
-    mkdir -p "${SUBVOL_DATA}/usr_overlay/upperdir"
-    mkdir -p "${SUBVOL_DATA}/usr_overlay/workdir"
+    mkdir "${SUBVOL_DATA}/usr_overlay/upperdir"
+    mkdir "${SUBVOL_DATA}/usr_overlay/workdir"
     btrfs subvol create "${SUBVOL_DATA}/boot_overlay"
-    mkdir -p "${SUBVOL_DATA}/boot_overlay/upperdir"
-    mkdir -p "${SUBVOL_DATA}/boot_overlay/workdir"
+    mkdir "${SUBVOL_DATA}/boot_overlay/upperdir"
+    mkdir "${SUBVOL_DATA}/boot_overlay/workdir"
 
     # TODO: here mount (and immediatly umount) the /usr overlay
 
     btrfs property set -fts "${SUBVOL_DATA}/usr_overlay" ro true
+    btrfs property set -fts "${SUBVOL_DATA}/boot_overlay" ro true
 
     if [ -d "${MOUNT_PATH}/etc" ] && [ -z $sysroot_snapshot ]; then
         echo "Cloning the /etc overlay upperdir from '${MOUNT_PATH}/etc/' to '${SUBVOL_DATA}/etc_overlay/upperdir'..."
