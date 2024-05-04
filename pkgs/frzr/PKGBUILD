@@ -23,6 +23,8 @@ package() {
     install -m 755 "$srcdir/frzr-$pkgver/__frzr" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-deploy" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr-deploy" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/frzr-sdboot" "$pkgdir/usr/bin"
+    install -m 755 "$srcdir/frzr-$pkgver/__frzr-sdboot" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr-debug" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-kernel" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr-kernel" "$pkgdir/usr/bin"
