@@ -128,7 +128,6 @@ export PACKAGES="\
 	podman \
 	pulsemixer \
 	python \
-	python-inotify-simple \
 	python-notify2 \
 	qtractor \
 	retroarch \
@@ -219,6 +218,7 @@ export AUR_PACKAGES="\
 	opengamepadui-session-git \
 	pikaur \
 	python-gbopyrator \
+	python-inotify-simple \
 	python-vdf \
 	r8152-dkms \
 	retroarch-autoconfig-udev-git \
@@ -228,7 +228,7 @@ export AUR_PACKAGES="\
 	rtl8821au-dkms-git \
 	ryzenadj \
 	steam_notif_daemon \
-        steam-powerbuttond-git \
+	steam-powerbuttond-git \
 	steam-removable-media-git \
 	wyvern \
 	zenergy-dkms-git \
