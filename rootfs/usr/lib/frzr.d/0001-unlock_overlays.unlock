@@ -1,5 +1,7 @@
 # Unlock overlays
 
+frzr_migration_version=1
+
 post_unlock() {
     local MOUNT_PATH=$1
     local SUBVOL=$2
