@@ -25,6 +25,7 @@ package() {
     mkdir -p "$pkgdir/usr/bin"
     mkdir -p "$pkgdir/usr/lib/frzr"
     mkdir -p "$pkgdir/usr/lib/systemd/system"
+    mkdir -p "$pkgdir/usr/share/libalpm/hooks"
     install -m 755 "$srcdir/frzr-$pkgver/frzr" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/__frzr" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-deploy" "$pkgdir/usr/bin"
