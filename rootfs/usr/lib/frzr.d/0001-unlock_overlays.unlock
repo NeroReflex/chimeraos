@@ -6,6 +6,7 @@ post_unlock() {
     local MOUNT_PATH=$1
     local SUBVOL=$2
     local NAME=$3
+    local FRZR_VER=$4
 
     # check 0004-install_overlays.migration
     DEPLOYMENT_DATA="${MOUNT_PATH}/deployments_data"
