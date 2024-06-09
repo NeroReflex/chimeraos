@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # triggers notification for reboot in old BPM
 
 frzr_migration_version=1

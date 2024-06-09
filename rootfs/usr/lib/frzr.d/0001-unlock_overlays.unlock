@@ -1,3 +1,5 @@
+#! /bin/bash
+
 # Unlock overlays
 
 frzr_migration_version=1
