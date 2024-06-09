@@ -33,6 +33,7 @@ export PACKAGES="\
 	epiphany \
 	ethtool \
 	evtest \
+	fakeroot \
 	ffmpeg \
 	file \
 	ffmpegthumbnailer \
@@ -76,6 +77,7 @@ export PACKAGES="\
 	lib32-libva \
 	lib32-libva-intel-driver \
 	lib32-libva-vdpau-driver \
+	lib32-mangohud \
 	lib32-openal \
 	lib32-pipewire \
 	lib32-sdl2 \
@@ -110,6 +112,7 @@ export PACKAGES="\
 	lrzip \
 	loupe \
 	lshw \
+	mangohud \
 	mesa-demos \
 	modemmanager \
 	nano \
@@ -164,9 +167,9 @@ export PACKAGES="\
 "
 
 export PACKAGE_OVERRIDES="\
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.1-chos3-1/linux-chimeraos-6.9.1.chos3-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.1-chos3-1/linux-chimeraos-headers-6.9.1.chos3-1-x86_64.pkg.tar.zst\
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.0-chos1-1/lib32-libva-mesa-driver-1--24.1.0.chos1-1-x86_64.pkg.tar.zst\
+	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.3-chos2-1/linux-chimeraos-6.9.3.chos2-1-x86_64.pkg.tar.zst \
+	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.3-chos2-1/linux-chimeraos-headers-6.9.3.chos2-1-x86_64.pkg.tar.zst \
+	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.0-chos1-1/lib32-libva-mesa-driver-1--24.1.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.0-chos1-1/lib32-mesa-1--24.1.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.0-chos1-1/lib32-mesa-vdpau-1--24.1.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.0-chos1-1/lib32-opencl-rusticl-mesa-1--24.1.0.chos1-1-x86_64.pkg.tar.zst \
@@ -220,7 +223,6 @@ export AUR_PACKAGES="\
 	python-gbopyrator \
 	python-inotify-simple \
 	python-vdf \
-	r8152-dkms \
 	rtl8812au-dkms-git \
 	rtl8814au-dkms-git \
 	rtl88x2bu-dkms-git \
@@ -242,6 +244,7 @@ export SERVICES="\
 	haveged \
 	home-swapfile.swap \
 	inputplumber \
+	inputplumber-resume \
 	lightdm \
 	powerstation \
 	steam-powerbuttond \
