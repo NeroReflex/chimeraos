@@ -196,12 +196,6 @@ if [ -e "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img" ]; then
 	rm "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img"
 fi
 
-# move kernel image and initrd to a defualt location if "linux" is not used
-if [ ${KERNEL_PACKAGE} != 'linux' ] ; then
-	mv /boot/vmlinuz-${KERNEL_PACKAGE} /boot/vmlinuz-linux
-	mv /boot/initramfs-${KERNEL_PACKAGE}.img /boot/initramfs-linux.img
-fi
-
 # clean up/remove unnecessary files
 rm -rf \
 /own_pkgs \
