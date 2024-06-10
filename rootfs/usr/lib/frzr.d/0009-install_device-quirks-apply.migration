@@ -1,0 +1,46 @@
+#! /bin/bash
+
+# Create the /etc and /var overlay
+
+frzr_migration_version=1
+
+post_install() {
+    local MOUNT_PATH=$1
+	local SUBVOL=$2
+    local NAME=$3
+	local FRZR_VER=$4
+
+    DEPLOYMENT_QUIRKS="${MOUNT_PATH}/device_quirks"
+    SUBVOL_QUIRKS="${DEPLOYMENT_QUIRKS}/${NAME}"
+
+    if [ -d "${DEPLOYMENT_QUIRKS}" ]; then
+        if [ -d "${SUBVOL_QUIRKS}/usr" ]; then
+            if [ -d "${SUBVOL_QUIRKS}/etc" ]; then
+                if [ -d "${SUBVOL_QUIRKS}/boot" ]; then
+                    if [ -d "${SUBVOL_QUIRKS}/var" ]; then
+                        if [ -e "${SUBVOL}/usr/share/device-quirks/id-device" ]; then
+
+                            # Run the following in chroot
+                            #${SUBVOL}/usr/share/device-quirks/id-device
+
+                            echo "OK"
+
+                        else
+                            echo "WARNING: Device-quirks package was not found"
+                        fi
+                    else
+                        echo "ERROR: Could not find directory '${DEPLOYMENT_QUIRKS}/var'"
+                    fi
+                else
+                    echo "ERROR: Could not find directory '${DEPLOYMENT_QUIRKS}/boot'"
+                fi
+            else
+                echo "ERROR: Could not find directory '${DEPLOYMENT_QUIRKS}/etc'"
+            fi
+        else
+            echo "ERROR: Could not find directory '${DEPLOYMENT_QUIRKS}/usr'"
+        fi
+    else
+        echo "ERROR: Could not find directory '${DEPLOYMENT_QUIRKS}'"
+    fi
+}
