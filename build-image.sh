@@ -98,8 +98,8 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 # update package databases
 pacman --noconfirm -Syy
 
-# Install the new iptables
-yes | pacman -S iptables-nft
+yes | pacman -S pipewire pipewire-jack
+
 
 # install kernel package
 if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
@@ -120,6 +120,9 @@ rm -rf /var/cache/pacman/pkg
 # install AUR packages
 pacman --noconfirm -U --overwrite '*' /extra_pkgs/*
 rm -rf /var/cache/pacman/pkg
+
+# Install the new iptables
+yes | pacman -S iptables-nft
 
 # enable services
 systemctl enable ${SERVICES}
