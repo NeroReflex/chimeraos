@@ -43,7 +43,7 @@ export DEVICE_QUIRKS_LOCATION=\"/mnt\"
 
 /usr/share/device-quirks/id-device
 
-DESTDIR="${SUBVOL_QUIRKS}/" mkinitcpio -P all
+DESTDIR="/mnt" mkinitcpio -P all
 EOF
 
                                                                 # umount mounted devices
