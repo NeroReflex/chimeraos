@@ -78,6 +78,10 @@ arch-chroot ${BUILD_PATH} /bin/bash <<EOF
 set -e
 set -x
 
+# This will prevent frzr bootloader from erroring when installing kernels
+# due to the pacman hook being executed at kernel-install time
+export FRZR_IMAGE_GENERATION=1
+
 source /manifest
 
 pacman-key --populate
@@ -93,6 +97,9 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 
 # update package databases
 pacman --noconfirm -Syy
+
+# Install the new iptables
+yes | pacman -S iptables-nft
 
 # install kernel package
 if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
