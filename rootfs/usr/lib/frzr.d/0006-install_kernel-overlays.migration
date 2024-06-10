@@ -28,7 +28,7 @@ post_install() {
                 echo "ERROR: Cannot create '${KERNEL_OVERLAYS_PATH}/etc'"
             fi
         else
-                echo "ERROR: Cannot create '${KERNEL_OVERLAYS_PATH}/boot'"
+            echo "ERROR: Cannot create '${KERNEL_OVERLAYS_PATH}/boot'"
         fi
     else
         echo "ERROR: Cannot create '${KERNEL_OVERLAYS_PATH}/usr'"
