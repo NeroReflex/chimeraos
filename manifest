@@ -201,7 +201,6 @@ export AUR_PACKAGES="\
 	bcm20702a1-firmware \
 	boxtron \
 	chimera \
-	chimeraos-device-quirks-git \
 	downgrade \
 	evdev-keepalive \
 	gamescope-session-steam-git \
