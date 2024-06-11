@@ -30,10 +30,10 @@ post_install() {
                                             mkdir -p /tmp/devquirks_work/boot
                                             mkdir -p /tmp/devquirks_work/var
 
-                                            if mount -t overlay -o lowerdir=${SUBVOL}/usr,upperdir=${SUBVOL_QUIRKS}/usr,workdir=/tmp/devquirks_work/usr overlay "${SUBVOL}/usr"; then
-                                                if mount -t overlay -o lowerdir=${SUBVOL}/etc,upperdir=${SUBVOL_QUIRKS}/etc,workdir=/tmp/devquirks_work/etc overlay "${SUBVOL}/etc"; then
-                                                    if mount -t overlay -o lowerdir=${SUBVOL}/boot,upperdir=${SUBVOL_QUIRKS}/boot,workdir=/tmp/devquirks_work/boot overlay "${SUBVOL}/boot"; then
-                                                        if mount -t overlay -o lowerdir=${SUBVOL}/var,upperdir=${SUBVOL_QUIRKS}/var,workdir=/tmp/devquirks_work/var overlay "${SUBVOL}/var"; then
+                                            if mount -t overlay -o lowerdir=${SUBVOL}/usr,upperdir=${SUBVOL_QUIRKS}/usr,workdir=/tmp/devquirks_work/usr,index=off,metacopy=off "${SUBVOL}/usr"; then
+                                                if mount -t overlay -o lowerdir=${SUBVOL}/etc,upperdir=${SUBVOL_QUIRKS}/etc,workdir=/tmp/devquirks_work/etc,index=off,metacopy=off "${SUBVOL}/etc"; then
+                                                    if mount -t overlay -o lowerdir=${SUBVOL}/boot,upperdir=${SUBVOL_QUIRKS}/boot,workdir=/tmp/devquirks_work/boot,index=off,metacopy=off "${SUBVOL}/boot"; then
+                                                        if mount -t overlay -o lowerdir=${SUBVOL}/var,upperdir=${SUBVOL_QUIRKS}/var,workdir=/tmp/devquirks_work/var,index=off,metacopy=off "${SUBVOL}/var"; then
                                                             # Run the following in chroot
                                                             chroot ${SUBVOL} /bin/bash <<EOF
 export DEVICE_QUIRKS_LOCATION=\"/mnt\"
