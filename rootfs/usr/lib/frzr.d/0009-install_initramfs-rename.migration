@@ -23,6 +23,11 @@ post_install() {
                     # Extract the matching part of the filename and remove the .img extension
                     kernel_version=$(basename "${vmlinuz_file_path}" | sed 's/^vmlinuz-//')
 
+                    # Exclude vmlinuz-linux
+                    if [ "$kernel_version" = "linux" ]; then
+                        continue
+                    fi
+
                     # $initramfs_file is the initramfs name of the file in /boot: find the corresponding vmlinuz file
                     initramfs_file="initramfs-${kernel_version}.img"
                     

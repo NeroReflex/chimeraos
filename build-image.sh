@@ -206,6 +206,16 @@ if [ -e "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img" ]; then
 	rm "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img"
 fi
 
+# The following is kept for compatibility with older frzr
+# This can safely be removed when the compatibility with
+# frzr pre-v1.0.0 will be dropped
+if [ "${KERNEL_PACKAGE}" = "linux" ]; then
+	echo "Kernel is named 'linux' nothing to do."
+else
+	touch /boot/vmlinux-linux
+	touch /boot/initramfs-linux.img
+fi
+
 # clean up/remove unnecessary files
 rm -rf \
 /own_pkgs \
