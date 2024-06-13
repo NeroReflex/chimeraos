@@ -25,10 +25,10 @@ post_install() {
                             if chown root:frzr "${KERNEL_OVERLAYS_PATH}/boot"; then
                                 if chown root:frzr "${KERNEL_OVERLAYS_PATH}/etc"; then
                                     if chown root:frzr "${KERNEL_OVERLAYS_PATH}/var"; then
-                                        if chmod g+s "${KERNEL_OVERLAYS_PATH}/usr"
-                                            if chmod g+s "${KERNEL_OVERLAYS_PATH}/boot"
-                                                if chmod g+s "${KERNEL_OVERLAYS_PATH}/etc"
-                                                    if chmod g+s "${KERNEL_OVERLAYS_PATH}/var"
+                                        if chmod g+s "${KERNEL_OVERLAYS_PATH}/usr"; then
+                                            if chmod g+s "${KERNEL_OVERLAYS_PATH}/boot"; then
+                                                if chmod g+s "${KERNEL_OVERLAYS_PATH}/etc"; then
+                                                    if chmod g+s "${KERNEL_OVERLAYS_PATH}/var"; then
                                                         echo "OK"
                                                     else
                                                         echo "WARNING: Cannot set setgid to '${KERNEL_OVERLAYS_PATH}/var'"
