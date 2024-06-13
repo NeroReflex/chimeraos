@@ -15,9 +15,9 @@ post_install() {
     local SUBVOL_QUIRKS_WORKDIR="${DEPLOYMENT_QUIRKS}/${NAME}/workdir"
 
     # if this installation is being done on a refactored frzr apply device-quirks here
-    if [ -z "${FRZR_VER}" ]; then
-        echo "OK"
-    else
+    #if [ -z "${FRZR_VER}" ]; then
+    #    echo "OK"
+    #else
         if [ -n "${FIRMWARE_OVERRIDE}" ];then
             if [ -d "${DEPLOYMENT_QUIRKS}" ]; then
                 if [ -d "${SUBVOL_QUIRKS}/usr" ]; then
@@ -105,5 +105,5 @@ EOF
         else
             echo "OK"
         fi
-    fi
+    #fi
 }

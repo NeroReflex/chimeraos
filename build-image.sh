@@ -133,9 +133,12 @@ systemctl --global enable ${USER_SERVICES}
 # disable root login
 passwd --lock root
 
+# add root to the frzr group
+sudo usermod -a -G frzr root
+
 # create user
 groupadd -r autologin
-useradd -m ${USERNAME} -G autologin,wheel,plugdev
+useradd -m ${USERNAME} -G autologin,wheel,plugdev,frzr
 echo "${USERNAME}:${USERNAME}" | chpasswd
 
 # set the default editor, so visudo works
@@ -160,7 +163,10 @@ PrintMotd no # pam does that
 Subsystem	sftp	/usr/lib/ssh/sftp-server
 " > /etc/ssh/sshd_config
 
+# Write the fstab file
+# WARNING: mounting partitions using LABEL exposes us to a bug where multiple disks cannot have frzr systems and how to solve this still is an open question
 echo "
+LABEL=frzr_efi  /efi       vfat      defaults,rw,noauto,noexec,nosuid,nodev,uid=0,gid=frzr,dmask=007,fmask=007                                                                                                                                                                                                                                                                                                                                                                                                                                         0   2
 LABEL=frzr_root /frzr_root btrfs     defaults,x-initrd.mount,subvolid=5,rw,noatime,nodatacow                                                                                                                                                                                                                                                                                                                                                                                                                                                           0   2
 LABEL=frzr_root /home      btrfs     defaults,x-systemd.rw-only,subvolid=257,rw,noatime,nodatacow,nofail                                                                                                                                                                                                                                                                                                                                                                                                                                               0   0
 overlay         /boot      overlay   defaults,x-systemd.requires-mounts-for=/frzr_root,x-systemd.requires-mounts-for=/sysroot/frzr_root,x-initrd.mount,lowerdir=/sysroot/frzr_root/kernels/boot:/sysroot/frzr_root/device_quirks/${SYSTEM_NAME}-${VERSION}/boot:/sysroot/boot,upperdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/boot_overlay/upperdir,workdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/boot_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,comment=bootoverlay             0   0
