@@ -51,7 +51,7 @@ package() {
     install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.timer" "$pkgdir/usr/lib/systemd/system"
     install -m 644 "$srcdir/99-frzr-kernel-install.hook" "$pkgdir/usr/share/libalpm/hooks"
 
-    echo 'uq frzr - "frzr system update manager"' | install -Dm644 /dev/stdin "$pkgdir/usr/lib/sysusers.d/$pkgname.conf"
+    echo 'g frzr 379 - -' | install -Dm644 /dev/stdin "$pkgdir/usr/lib/sysusers.d/$pkgname.conf"
 
 }
 
