@@ -24,19 +24,19 @@ source=(
     "90-dracut-install.hook"
 )
 sha256sums=(
-    'SKIP' # dracut-install.sh
-    'SKIP' # dracut-remove.sh
-    'SKIP' # 00-chimeraos.conf
-    'SKIP' # 10-chimeraos_use-fstab.conf
-    'SKIP' # 20-chimeraos_include-plymouth.conf
-    'SKIP' # 30-chimeraos_include-filesystems.conf
-    'SKIP' # 40-chimeraos_exclude-encryption.conf
-    'SKIP' # 50-chimeraos_exclude-mdraid.conf
-    'SKIP' # 60-chimeraos_exclude-networking.conf
-    'SKIP' # 70-chimeraos_exclude-nvdimm.conf
-    'SKIP' # 80-chimeraos_exclude-qemu.conf
-    'SKIP' # 60-dracut-remove.hook
-    'SKIP' # 90-dracut-install.hook
+    'c7692e77b36ba5007af1dd73cfce48dd47eb67767eda2f148227a66df57c5245' # dracut-install.sh
+    'b4ed89f320dc791c9830c42da16f840a2839ab8597b0b1e52e5f73df4a5b90f0' # dracut-remove.sh
+    'e6558e94eaac394e8147cb6c6324bad3fe486f5db5055a6a26d5123fd498620f' # 00-chimeraos.conf
+    '7886062a7293d2e6bd6e975c4a8aaae63342af366479db8adf1b75860081cf53' # 10-chimeraos_use-fstab.conf
+    '200e84e62b015d188ab2be413a0551f38c8939cfdd27e0cb91a22e214bf1a5ab' # 20-chimeraos_include-plymouth.conf
+    '34733adf034035d832b150164a85ca534af0000490d65151a8f6927d6d94eaff' # 30-chimeraos_include-filesystems.conf
+    'bfb2af27d632f21fc0c00af72d82921f2dec3134ee916ccbf4c1cb9e0c7a2259' # 40-chimeraos_exclude-encryption.conf
+    '84cccef9706590795b37b4d949c0a34e6ee7ba34ee7ff01a8c808a2fe3ff7f89' # 50-chimeraos_exclude-mdraid.conf
+    '3a5767d2ad8bb59518025f5d5767cd0a0ca05b4dd500fce7f9d79a3bf27b9a4a' # 60-chimeraos_exclude-networking.conf
+    '5822aa5a698577937820ab2565a203492b6af81434bf1423664ef68bba8c1617' # 70-chimeraos_exclude-nvdimm.conf
+    'b126149ca9f79bb1deb7ec640f4452dd61f4214558f954b7bc9196c5e9ca6ef0' # 80-chimeraos_exclude-qemu.conf
+    '41c996bf7ef90e6a81690c4a06cbef89167882a036699834fe22637a1a184982' # 60-dracut-remove.hook
+    'df94baaf97d110f65f1443dd7063fe0e8ec1f73b5baf142c6ff08c260e571fcb' # 90-dracut-install.hook
 )
 
 package() {
