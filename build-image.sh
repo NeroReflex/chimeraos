@@ -99,7 +99,6 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 pacman --noconfirm -Syy
 
 pacman -S --noconfirm dracut
-pacman -R --noconfirm mkinitcpio
 
 # Install dracut and refactored frzr before the kernel
 pacman --noconfirm -U --overwrite '*' /own_pkgs/chimeraos-dracut-*
