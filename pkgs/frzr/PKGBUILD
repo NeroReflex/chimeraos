@@ -44,8 +44,6 @@ package() {
     install -m 755 "$srcdir/frzr-$pkgver/frzr-source" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-extras" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-release" "$pkgdir/usr/bin"
-    install -m 755 "$srcdir/frzr-$pkgver/frzr-initramfs" "$pkgdir/usr/bin"
-    install -m 755 "$srcdir/frzr-$pkgver/frzr-tweaks" "$pkgdir/usr/bin"
     #install -m 644 "$srcdir/frzr-$pkgver/mkinitcpio.conf" "$pkgdir/usr/lib/frzr"
     install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.service" "$pkgdir/usr/lib/systemd/system"
     install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.timer" "$pkgdir/usr/lib/systemd/system"
