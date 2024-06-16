@@ -98,12 +98,6 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 # update package databases
 pacman --noconfirm -Syy
 
-# Install dracut and refactored frzr before the kernel
-pacman --noconfirm -U --overwrite '*' /own_pkgs/chimeraos-dracut-* /own_pkgs/frzr-*
-
-# After the installation remove those files otherwise initramfs will be regenerated twice (wasting build time)
-rm -f /own_pkgs/chimeraos-dracut-* /own_pkgs/frzr-*
-
 yes | pacman -S pipewire pipewire-jack
 
 # install kernel package
