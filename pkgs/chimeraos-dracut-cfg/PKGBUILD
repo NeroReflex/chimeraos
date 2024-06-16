@@ -7,7 +7,11 @@ pkgdesc="Dracut-specific configuration for chimeraos"
 arch=('any')
 url="https://github.com/ChimeraOS/chimeraos"
 license=('MIT')
-depends=('dracut' 'plymouth')
+depends=(
+    'dracut' # regenerate the initramfs
+    'plymouth' # support for boot animations
+    'binutils' # allow usage of --strip
+)
 source=(
     "dracut-install.sh"
     "dracut-remove.sh"
