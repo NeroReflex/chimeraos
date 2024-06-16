@@ -24,7 +24,7 @@ source=(
     "60-chimeraos_exclude-networking.conf"
     "70-chimeraos_exclude-nvdimm.conf"
     "80-chimeraos_exclude-qemu.conf"
-    "80-chimeraos_exclude-bluetooth.conf"
+    "90-chimeraos_exclude-bluetooth.conf"
     "60-dracut-remove.hook"
     "90-dracut-install.hook"
 )
@@ -40,6 +40,7 @@ sha256sums=(
     '3a5767d2ad8bb59518025f5d5767cd0a0ca05b4dd500fce7f9d79a3bf27b9a4a' # 60-chimeraos_exclude-networking.conf
     '5822aa5a698577937820ab2565a203492b6af81434bf1423664ef68bba8c1617' # 70-chimeraos_exclude-nvdimm.conf
     'b126149ca9f79bb1deb7ec640f4452dd61f4214558f954b7bc9196c5e9ca6ef0' # 80-chimeraos_exclude-qemu.conf
+    'e983493fe3e7d9395dd8d1c8949150144c8d4318ff17ff2aca004235734c8299' # 90-chimeraos_exclude-bluetooth.conf
     '41c996bf7ef90e6a81690c4a06cbef89167882a036699834fe22637a1a184982' # 60-dracut-remove.hook
     'df94baaf97d110f65f1443dd7063fe0e8ec1f73b5baf142c6ff08c260e571fcb' # 90-dracut-install.hook
 )
@@ -64,6 +65,8 @@ package() {
     install -m 644 "$srcdir/60-chimeraos_exclude-networking.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/70-chimeraos_exclude-nvdimm.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/80-chimeraos_exclude-qemu.conf" "$pkgdir/etc/dracut.conf.d"
+    install -m 644 "90-chimeraos_exclude-bluetooth.conf" "$pkgdir/etc/dracut.conf.d"
+
     install -m 644 "$srcdir/60-dracut-remove.hook" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/90-dracut-install.hook" "$pkgdir/etc/dracut.conf.d"
 }
