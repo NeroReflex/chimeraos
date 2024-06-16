@@ -7,7 +7,10 @@ pkgdesc="A deployment and update system for read-only btrfs subvolume based oper
 arch=('any')
 url="https://github.com/NeroReflex/frzr"
 license=('MIT')
-depends=('file' 'btrfs-progs' 'parted' 'libnewt' 'dosfstools' 'jq' 'util-linux' 'zstd' 'xz' 'mkinitcpio')
+depends=('file' 'btrfs-progs' 'parted' 'libnewt' 'dosfstools' 'jq' 'util-linux' 'zstd' 'xz')
+optdepends=(
+    'dracut: generate initramfs for kernels installed via frzr kernel command'
+)
 source=(
     "$pkgname-$pkgver.zip::https://github.com/NeroReflex/frzr/archive/refs/heads/refactor.zip"
     "99-frzr-kernel-install.hook"
