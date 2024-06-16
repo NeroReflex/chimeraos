@@ -24,6 +24,13 @@ Target = mkinitcpio-git
 Type = Package
 Operation = Install
 Operation = Upgrade
+Target = dracut
+Target = dracut-git
+
+[Trigger]
+Type = Package
+Operation = Install
+Operation = Upgrade
 Target = frzr
 Target = frzr-git
 

@@ -14,7 +14,7 @@ source=(
 )
 sha256sums=(
     'SKIP'
-    'aae0522a98259af330d754ba290cd001f22c28f687382ba540948bf2c88f2fc6'
+    '0dc3772b4c9a96ad33993be1245f23af32ee765ad6fca4e2310a8683ada5cbcc'
 )
 
 package() {
@@ -46,7 +46,7 @@ package() {
     install -m 755 "$srcdir/frzr-$pkgver/frzr-release" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-initramfs" "$pkgdir/usr/bin"
     install -m 755 "$srcdir/frzr-$pkgver/frzr-tweaks" "$pkgdir/usr/bin"
-    install -m 644 "$srcdir/frzr-$pkgver/mkinitcpio.conf" "$pkgdir/usr/lib/frzr"
+    #install -m 644 "$srcdir/frzr-$pkgver/mkinitcpio.conf" "$pkgdir/usr/lib/frzr"
     install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.service" "$pkgdir/usr/lib/systemd/system"
     install -m 644 "$srcdir/frzr-$pkgver/frzr-autoupdate.timer" "$pkgdir/usr/lib/systemd/system"
     install -m 644 "$srcdir/99-frzr-kernel-install.hook" "$pkgdir/usr/share/libalpm/hooks"

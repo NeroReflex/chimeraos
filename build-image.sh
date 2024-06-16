@@ -98,8 +98,13 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 # update package databases
 pacman --noconfirm -Syy
 
-yes | pacman -S pipewire pipewire-jack
+pacman -S --noconfirm dracut
 
+# Install dracut and refactored frzr before the kernel
+pacman --noconfirm -U --overwrite '*' /own_pkgs/chimeraos-dracut-*
+pacman --noconfirm -U --overwrite '*' /own_pkgs/frzr-*
+
+yes | pacman -S pipewire pipewire-jack
 
 # install kernel package
 if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
