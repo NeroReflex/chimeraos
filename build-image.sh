@@ -111,6 +111,9 @@ else
 	pacman --noconfirm -S "${KERNEL_PACKAGE}" "${KERNEL_PACKAGE}-headers"
 fi
 
+# Temporary workaround to prevent ardour from being installed
+pacman -S --noconfirm qtractor
+
 # install own override packages
 pacman --noconfirm -U --overwrite '*' /own_pkgs/*
 rm -rf /var/cache/pacman/pkg
