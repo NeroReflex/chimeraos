@@ -99,7 +99,7 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 pacman --noconfirm -Syy
 
 # Avoid mkintcpio being auto-installed while installing the kernel (we want dracut)
-pacman -S dracut
+pacman -S --noconfirm dracut
 
 yes | pacman -S pipewire pipewire-jack
 
