@@ -223,7 +223,7 @@ fi
 if [ "${KERNEL_PACKAGE}" = "linux" ]; then
 	echo "Kernel is named 'linux' nothing to do."
 else
-	touch /boot/vmlinux-linux
+	touch /boot/vmlinuz-linux
 	touch /boot/initramfs-linux.img
 fi
 
