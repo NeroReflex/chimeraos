@@ -50,8 +50,8 @@ post_install() {
             vmlinuz_file="vmlinuz-${kernel_version}"
 
             # Attempt to move vmlinuz and initramfs file into location suitable for older frzr versions
-            if mv "${bootdir}/${vmlinuz_file}" "${kernel_dest_dir}/vmlinuz-linux"; then
-                if mv "${bootdir}/${initramfs_file}" "${kernel_dest_dir}/initramfs-linux.img"; then
+            if cp "${bootdir}/${vmlinuz_file}" "${kernel_dest_dir}/vmlinuz-linux"; then
+                if cp "${bootdir}/${initramfs_file}" "${kernel_dest_dir}/initramfs-linux.img"; then
                     echo ""
                     return 0
                 else
