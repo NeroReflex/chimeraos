@@ -167,8 +167,8 @@ export PACKAGES="\
 "
 
 export PACKAGE_OVERRIDES="\
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.4-chos1-1/linux-chimeraos-6.9.4.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.4-chos1-1/linux-chimeraos-headers-6.9.4.chos1-1-x86_64.pkg.tar.zst \
+	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.5-chos1-1/linux-chimeraos-6.9.5.chos1-1-x86_64.pkg.tar.zst \
+	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.9.5-chos1-1/linux-chimeraos-headers-6.9.5.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.1-chos1-1/lib32-libva-mesa-driver-1--24.1.1.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.1-chos1-1/lib32-mesa-1--24.1.1.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.1-chos1-1/lib32-mesa-vdpau-1--24.1.1.chos1-1-x86_64.pkg.tar.zst \
@@ -195,7 +195,7 @@ export PACKAGE_OVERRIDES="\
 # Which is often the same as the package name but it can be different.
 # Check on the AUR webpage if you are unsure
 export AUR_PACKAGES="\
-	antimicrox \
+	asusctl \
 	ayaneo-platform-dkms-git \
 	ayn-platform-dkms-git \
 	bcm20702a1-firmware \
