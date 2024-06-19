@@ -129,7 +129,6 @@ export PACKAGES="\
 	pipewire-jack \
 	pipewire-pulse \
 	podman \
-	plymouth \
 	pulsemixer \
 	python \
 	python-notify2 \
