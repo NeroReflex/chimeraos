@@ -29,15 +29,15 @@ source=(
     "90-dracut-install.hook"
 )
 sha256sums=(
-    '481ab9b79f0d15518bd0d69e74fa819a9859a179e887856db8690529436a16dd' # dracut-install.sh
+    '827d59e8fda5c16b3fc45eb89ce7cd5be6c40d35dd8fe9a8d5ea825a63d3a089' # dracut-install.sh
     'daefb58a0bf6df48cceaf4f7a898c17ca1f24e18cd7981b19f5f2034499592ed' # dracut-remove.sh
-    '3f16bd8bd816d3d28d3ef2e691fd3d3df7d5ad69c2a26aa436e076a42365cecb' # 00-chimeraos.conf
+    '95875324f9541d189f5df20850b6f7d6a67eb5d54b266078cfa174bb722ba44b' # 00-chimeraos.conf
     '7886062a7293d2e6bd6e975c4a8aaae63342af366479db8adf1b75860081cf53' # 10-chimeraos_use-fstab.conf
     '200e84e62b015d188ab2be413a0551f38c8939cfdd27e0cb91a22e214bf1a5ab' # 20-chimeraos_include-plymouth.conf
     '676b4a216cd3787882edf2e5bdaebce4577a11dbae176f81bab1c1b72917fc09' # 30-chimeraos_include-filesystems.conf
     '8b4247161bb9158bf382517bb061360c184315e71fea244420d8db99d2730129' # 40-chimeraos_exclude-encryption.conf
     '84cccef9706590795b37b4d949c0a34e6ee7ba34ee7ff01a8c808a2fe3ff7f89' # 50-chimeraos_exclude-mdraid.conf
-    '3a5767d2ad8bb59518025f5d5767cd0a0ca05b4dd500fce7f9d79a3bf27b9a4a' # 60-chimeraos_exclude-networking.conf
+    'e1f9caf3878e65ca28951642ad02c1b167eacba777b4ccc893f6b8702a6d474e' # 60-chimeraos_exclude-networking.conf
     '5822aa5a698577937820ab2565a203492b6af81434bf1423664ef68bba8c1617' # 70-chimeraos_exclude-nvdimm.conf
     'b126149ca9f79bb1deb7ec640f4452dd61f4214558f954b7bc9196c5e9ca6ef0' # 80-chimeraos_exclude-qemu.conf
     'e983493fe3e7d9395dd8d1c8949150144c8d4318ff17ff2aca004235734c8299' # 90-chimeraos_exclude-bluetooth.conf
