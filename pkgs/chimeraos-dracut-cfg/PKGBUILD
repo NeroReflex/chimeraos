@@ -17,7 +17,7 @@ source=(
     "dracut-remove.sh"
     "00-chimeraos.conf"
     "10-chimeraos_use-fstab.conf"
-    #"20-chimeraos_include-plymouth.conf"
+    "20-chimeraos_plymouth.conf"
     "30-chimeraos_include-filesystems.conf"
     "40-chimeraos_exclude-encryption.conf"
     "50-chimeraos_exclude-mdraid.conf"
@@ -31,9 +31,9 @@ source=(
 sha256sums=(
     '827d59e8fda5c16b3fc45eb89ce7cd5be6c40d35dd8fe9a8d5ea825a63d3a089' # dracut-install.sh
     'daefb58a0bf6df48cceaf4f7a898c17ca1f24e18cd7981b19f5f2034499592ed' # dracut-remove.sh
-    '95875324f9541d189f5df20850b6f7d6a67eb5d54b266078cfa174bb722ba44b' # 00-chimeraos.conf
+    'e9deaeb650eb2be2ee472f6ae957a6d676b9e7c90f2899b3d252b7f7319d745a' # 00-chimeraos.conf
     '7886062a7293d2e6bd6e975c4a8aaae63342af366479db8adf1b75860081cf53' # 10-chimeraos_use-fstab.conf
-    '200e84e62b015d188ab2be413a0551f38c8939cfdd27e0cb91a22e214bf1a5ab' # 20-chimeraos_include-plymouth.conf
+    '103cf3322954202c3f0f740cd9079546d059f919c8b1b07ac703ec6f94cf17fb' # 20-chimeraos_plymouth.conf
     '676b4a216cd3787882edf2e5bdaebce4577a11dbae176f81bab1c1b72917fc09' # 30-chimeraos_include-filesystems.conf
     '8b4247161bb9158bf382517bb061360c184315e71fea244420d8db99d2730129' # 40-chimeraos_exclude-encryption.conf
     '84cccef9706590795b37b4d949c0a34e6ee7ba34ee7ff01a8c808a2fe3ff7f89' # 50-chimeraos_exclude-mdraid.conf
@@ -58,7 +58,7 @@ package() {
 
     install -m 644 "$srcdir/00-chimeraos.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/10-chimeraos_use-fstab.conf" "$pkgdir/etc/dracut.conf.d"
-    #install -m 644 "$srcdir/20-chimeraos_include-plymouth.conf" "$pkgdir/etc/dracut.conf.d"
+    install -m 644 "$srcdir/20-chimeraos_plymouth.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/30-chimeraos_include-filesystems.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/40-chimeraos_exclude-encryption.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/50-chimeraos_exclude-mdraid.conf" "$pkgdir/etc/dracut.conf.d"
