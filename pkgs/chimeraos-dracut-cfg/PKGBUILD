@@ -9,7 +9,7 @@ url="https://github.com/ChimeraOS/chimeraos"
 license=('MIT')
 depends=(
     'dracut' # regenerate the initramfs
-    'plymouth' # support for boot animations
+    #'plymouth' # support for boot animations
     'binutils' # allow usage of --strip
 )
 source=(
@@ -17,7 +17,7 @@ source=(
     "dracut-remove.sh"
     "00-chimeraos.conf"
     "10-chimeraos_use-fstab.conf"
-    "20-chimeraos_include-plymouth.conf"
+    #"20-chimeraos_include-plymouth.conf"
     "30-chimeraos_include-filesystems.conf"
     "40-chimeraos_exclude-encryption.conf"
     "50-chimeraos_exclude-mdraid.conf"
@@ -58,7 +58,7 @@ package() {
 
     install -m 644 "$srcdir/00-chimeraos.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/10-chimeraos_use-fstab.conf" "$pkgdir/etc/dracut.conf.d"
-    install -m 644 "$srcdir/20-chimeraos_include-plymouth.conf" "$pkgdir/etc/dracut.conf.d"
+    #install -m 644 "$srcdir/20-chimeraos_include-plymouth.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/30-chimeraos_include-filesystems.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/40-chimeraos_exclude-encryption.conf" "$pkgdir/etc/dracut.conf.d"
     install -m 644 "$srcdir/50-chimeraos_exclude-mdraid.conf" "$pkgdir/etc/dracut.conf.d"
