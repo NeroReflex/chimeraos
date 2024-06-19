@@ -29,7 +29,7 @@ source=(
     "90-dracut-install.hook"
 )
 sha256sums=(
-    '17cdd42abda651deaf773a264b8a1cd2b5e5fa66b4e9705a42ab3733c941e227' # dracut-install.sh
+    '7f7c86119fee39e9b5e29fa25fb16ec09c8df92b851e74a4ccd6edd3c277b67b' # dracut-install.sh
     'daefb58a0bf6df48cceaf4f7a898c17ca1f24e18cd7981b19f5f2034499592ed' # dracut-remove.sh
     'e6558e94eaac394e8147cb6c6324bad3fe486f5db5055a6a26d5123fd498620f' # 00-chimeraos.conf
     '7886062a7293d2e6bd6e975c4a8aaae63342af366479db8adf1b75860081cf53' # 10-chimeraos_use-fstab.conf
