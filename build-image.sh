@@ -127,6 +127,11 @@ pacman --noconfirm -U --overwrite '*' /extra_pkgs/*
 rm -rf /var/cache/pacman/pkg
 
 # Install the new iptables
+# See https://gitlab.archlinux.org/archlinux/packaging/packages/iptables/-/issues/1
+# Since base package group adds iptables by default
+# pacman will ask for confirmation to replace that package
+# but the default answer is no.
+# doing yes | pacman omitting --noconfirm is a necessity 
 yes | pacman -S iptables-nft
 
 # enable services
@@ -197,7 +202,7 @@ ID_LIKE=arch
 ANSI_COLOR="1;31"
 HOME_URL="${WEBSITE}"
 DOCUMENTATION_URL="${DOCUMENTATION_URL}"
-BUG_REPORT_URL="${BUG_REPORT_URL}"' > /etc/os-release
+BUG_REPORT_URL="${BUG_REPORT_URL}"' > /usr/lib/os-release
 
 # install extra certificates
 trust anchor --store /extra_certs/*.crt
