@@ -123,6 +123,12 @@ export PACKAGES="\
 	nfs-utils \
 	noto-fonts-emoji \
 	nss-mdns \
+	nvidia-dkms \
+	opencl-nvidia \
+	lib32-opencl-nvidia \
+	nvidia-utils \
+	lib32-nvidia-utils \
+	nvidia-prime \
 	openal \
 	openrazer-daemon \
 	openssh \
@@ -255,6 +261,7 @@ export SERVICES="\
 	sshd \
 	systemd-timesyncd \
 	swapfile \
+	nvidia-powerd \
 "
 
 export USER_SERVICES="\
