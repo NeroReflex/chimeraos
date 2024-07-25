@@ -23,6 +23,7 @@ export PACKAGES="\
 	broadcom-wl-dkms \
 	bzip2 \
 	cifs-utils \
+	clang \
 	cpupower \
 	diffutils \
 	dkms \
@@ -108,6 +109,8 @@ export PACKAGES="\
 	lightdm \
 	linux-firmware \
 	liquidctl \
+	llvm \
+	lldb \
 	logrotate \
 	lrzip \
 	loupe \
