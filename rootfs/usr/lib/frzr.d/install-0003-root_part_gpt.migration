@@ -23,7 +23,7 @@ post_install() {
     echo "Fetching partition number of partition '$subcmd'"
     local part_number=$(echo "${subcmd: -1}")
 
-    local disk=$(echo "$subcmd" | sed 's/p[0-9]*$//' | sed 's/[0-9]*$//')
+    local disk=$(echo "$subcmd" | sed -E 's/p[0-9]+$|[0-9]+$//')
     local filtered_uuid=$(echo "${possible_uuid}" | grep -E '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}')
 
     echo "Setting partition ${part_number} of disk ${disk} (UUID='${filtered_uuid}') to GPT type 'Linux Root (x86-64)'"
