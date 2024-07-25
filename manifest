@@ -32,7 +32,6 @@ export PACKAGES="\
 	dosbox \
 	efibootmgr \
 	epiphany \
-	ethtool \
 	evtest \
 	fakeroot \
 	ffmpeg \
