@@ -10,8 +10,8 @@ export WEBSITE="https://chimeraos.org"
 export DOCUMENTATION_URL="https://chimeraos.org/about"
 export BUG_REPORT_URL="https://github.com/ChimeraOS/chimeraos/issues"
 
-export KERNEL_PACKAGE="linux-chimeraos"
-export KERNEL_PACKAGE_ORIGIN="local"
+export KERNEL_PACKAGE="linux-zen"
+export KERNEL_PACKAGE_ORIGIN="archlinux"
 
 export PACKAGES="\
 	accountsservice \
@@ -175,8 +175,6 @@ export PACKAGES="\
 "
 
 export PACKAGE_OVERRIDES="\
-	https://github.com/NeroReflex/linux-chimeraos/releases/download/chos%2Bzen/linux-chimeraos-6.10.0.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/NeroReflex/linux-chimeraos/releases/download/chos%2Bzen/linux-chimeraos-headers-6.10.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.3-chos1-1/lib32-libva-mesa-driver-1--24.1.3.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.3-chos1-1/lib32-mesa-1--24.1.3.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.1.3-chos1-1/lib32-mesa-vdpau-1--24.1.3.chos1-1-x86_64.pkg.tar.zst \
