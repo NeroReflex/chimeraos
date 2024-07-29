@@ -103,6 +103,7 @@ pacman -S --noconfirm dracut
 
 # install kernel package
 if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
+        mkdir /kernel_pkgs
 	mv /own_pkgs/${KERNEL_PACKAGE}-*.pkg.tar.zst /kernel_pkgs/
 fi
 
