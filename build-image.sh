@@ -103,10 +103,7 @@ pacman -S --noconfirm dracut
 
 # install kernel package
 if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
-	pacman --noconfirm -U --overwrite '*' \
-	/own_pkgs/${KERNEL_PACKAGE}-*.pkg.tar.zst 
-else
-	pacman --noconfirm -S "${KERNEL_PACKAGE}" "${KERNEL_PACKAGE}-headers"
+	mv /own_pkgs/${KERNEL_PACKAGE}-*.pkg.tar.zst /kernel_pkgs/
 fi
 
 # install own override packages
@@ -128,6 +125,15 @@ rm -rf /var/cache/pacman/pkg
 # but the default answer is no.
 # doing yes | pacman omitting --noconfirm is a necessity 
 yes | pacman -S iptables-nft
+
+# install kernel package
+if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
+	pacman --noconfirm -U --overwrite '*' \
+	/kernel_pkgs/${KERNEL_PACKAGE}-*.pkg.tar.zst 
+	rm -rf /kernel_pkgs
+else
+	pacman --noconfirm -S "${KERNEL_PACKAGE}" "${KERNEL_PACKAGE}-headers"
+fi
 
 # enable services
 systemctl enable ${SERVICES}
