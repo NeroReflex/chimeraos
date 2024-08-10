@@ -217,7 +217,6 @@ export AUR_PACKAGES="\
 	gamescope-session-steam-git \
 	gamescope-session-steam-plus-git \
 	hhfc-git \
-	inputplumber-bin \
 	legendary \
 	libretro-dosbox-pure-git \
 	libretro-opera-git \
@@ -253,8 +252,6 @@ export SERVICES="\
 	fstrim.timer \
 	haveged \
 	home-swapfile.swap \
-	inputplumber \
-	inputplumber-resume \
 	lightdm \
 	nvidia-powerd \
 	powerstation \

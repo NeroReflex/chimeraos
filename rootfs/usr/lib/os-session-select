@@ -71,9 +71,6 @@ plasma-x11-persistent)
 desktop | plasma)
 	session_launcher="gnome-session-oneshot"
 	create_sentinel=1
-	if (systemctl -q is-active inputplumber.service); then
-		sudo systemctl restart inputplumber || true
-	fi
 	;;
 opengamepadui | gamescope-session-opengamepadui)
 	session_launcher="gamescope-session-opengamepadui"
