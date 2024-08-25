@@ -6,6 +6,8 @@ set -x
 source manifest;
 
 echo "95.216.144.15 aur.archlinux.org" | sudo tee /etc/hosts
+echo "49.12.124.107 archive.archlinux.org" | sudo tee /etc/hosts
+echo "49.12.124.107 gemini.archlinux.org" | sudo tee /etc/hosts
 
 sudo mkdir -p /temp/package
 sudo chown build:build /temp/package
