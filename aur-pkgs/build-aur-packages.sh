@@ -5,6 +5,8 @@ set -x
 
 source manifest;
 
+echo "95.216.144.15 aur.archlinux.org" | sudo tee /etc/hosts
+
 sudo mkdir -p /workdir/aur-pkgs
 sudo chown build:build /workdir/aur-pkgs
 

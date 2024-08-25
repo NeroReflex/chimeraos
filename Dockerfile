@@ -2,8 +2,8 @@ FROM archlinux:base-devel
 LABEL contributor="shadowapex@gmail.com"
 COPY rootfs/etc/pacman.conf /etc/pacman.conf
 COPY rootfs/etc/resolv.conf /etc/resolv.conf
+COPY rootfs/etc/hosts /etc/hosts
 RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.conf
-RUN echo -e "95.216.144.15 aur.archlinux.org" >> /etc/hosts
 
 # Cannot check space in chroot
 RUN sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
