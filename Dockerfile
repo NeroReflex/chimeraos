@@ -52,6 +52,8 @@ RUN echo -e "#!/bin/bash\nif [[ \"$1\" == \"--version\" ]]; then echo 'fake 244 
 RUN sed -i '/BUILDENV/s/check/!check/g' /etc/makepkg.conf && \
     sed -i '/OPTIONS/s/debug/!debug/g' /etc/makepkg.conf
 
+RUN echo "95.216.144.15 aur.archlinux.org" | sudo tee /etc/hosts
+
 COPY manifest /manifest
 # Freeze packages and overwrite with overrides when needed
 RUN source /manifest && \
