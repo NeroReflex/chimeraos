@@ -54,7 +54,7 @@ jobs:
       - name: Build packages
         run: |
           docker pull ${{ steps.meta.outputs.tags }}
-          docker run --rm -v $(pwd):/workdir --entrypoint=/workdir/aur-pkgs/build-package.sh ${{ steps.meta.outputs.tags }} ${{ matrix.package }}
+          docker run --rm --network host -v $(pwd):/workdir --entrypoint=/workdir/aur-pkgs/build-package.sh ${{ steps.meta.outputs.tags }} ${{ matrix.package }}
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:
@@ -82,7 +82,7 @@ jobs:
       - name: Build packages
         run: |
           docker pull ${{ steps.meta.outputs.tags }}
-          docker run --rm -v $(pwd):/workdir --entrypoint=/workdir/pkgs/build-package.sh ${{ steps.meta.outputs.tags }} ${{ matrix.package }}
+          docker run --rm --network host -v $(pwd):/workdir --entrypoint=/workdir/pkgs/build-package.sh ${{ steps.meta.outputs.tags }} ${{ matrix.package }}
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:
