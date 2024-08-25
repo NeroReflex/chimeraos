@@ -6,11 +6,6 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
 # Cannot check space in chroot
 RUN sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 
-# Use cloudflare DNS to resolve hostnames
-RUN echo "nameserver 1.1.1.1" > /etc/resolv.conf && \
-    echo "nameserver 8.8.8.8" >> /etc/resolv.conf && \
-    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
-
 RUN pacman-key --init && \
     pacman --noconfirm -Syyuu && \
     pacman --noconfirm -S \
@@ -38,6 +33,11 @@ RUN echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 # and add that user to wheel group so that it can install packages
 # without being asked for a password
 RUN useradd build -G wheel -m
+
+# Use cloudflare DNS to resolve hostnames
+RUN echo "nameserver 1.1.1.1" > /etc/resolv.conf && \
+    echo "nameserver 8.8.8.8" >> /etc/resolv.conf && \
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
 
 # Build and install pikaur
 RUN su - build -c "git clone https://aur.archlinux.org/pikaur.git /tmp/pikaur" && \
