@@ -34,11 +34,6 @@ RUN echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 # without being asked for a password
 RUN useradd build -G wheel -m
 
-# Use cloudflare DNS to resolve hostnames
-RUN echo "nameserver 1.1.1.1" > /etc/resolv.conf && \
-    echo "nameserver 8.8.8.8" >> /etc/resolv.conf && \
-    echo "nameserver 8.8.4.4" >> /etc/resolv.conf
-
 # Build and install pikaur
 RUN su - build -c "git clone https://aur.archlinux.org/pikaur.git /tmp/pikaur" && \
     su - build -c "cd /tmp/pikaur && makepkg -f" && \
