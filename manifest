@@ -15,7 +15,6 @@ export KERNEL_PACKAGE_ORIGIN="local"
 
 export PACKAGES="\
 	accountsservice \
-	acpi_call-dkms \
 	alsa-firmware \
 	alsa-utils \
 	amd-ucode \
@@ -120,14 +119,7 @@ export PACKAGES="\
 	nfs-utils \
 	noto-fonts-emoji \
 	nss-mdns \
-	nvidia-dkms \
-	opencl-nvidia \
-	lib32-opencl-nvidia \
-	nvidia-utils \
-	lib32-nvidia-utils \
-	nvidia-prime \
 	openal \
-	openrazer-daemon \
 	openssh \
 	p7zip \
 	pipewire \
@@ -201,9 +193,6 @@ export PACKAGE_OVERRIDES="\
 # Check on the AUR webpage if you are unsure
 export AUR_PACKAGES="\
 	asusctl-git \
-	ayaneo-platform-dkms-git \
-	ayn-platform-dkms-git \
-	bcm20702a1-firmware \
 	boxtron \
 	chimera \
 	chimeraos-device-quirks-git \
@@ -230,10 +219,6 @@ export AUR_PACKAGES="\
 	powerstation-bin \
 	python-gbopyrator \
 	python-vdf \
-	rtl8812au-dkms-git \
-	rtl8814au-dkms-git \
-	rtl88x2bu-dkms-git \
-	rtl8821au-dkms-git \
 	ryzenadj-git \
 	steam_notif_daemon \
 	steam-powerbuttond-git \
@@ -251,9 +236,7 @@ export SERVICES="\
 	fstrim.timer \
 	haveged \
 	home-swapfile.swap \
-	inputplumber \
 	lightdm \
-	nvidia-powerd \
 	powerstation \
 	steam-powerbuttond \
 	sshd \
