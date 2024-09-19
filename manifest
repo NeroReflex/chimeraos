@@ -15,7 +15,6 @@ export KERNEL_PACKAGE_ORIGIN="local"
 
 export PACKAGES="\
 	accountsservice \
-	acpi_call-dkms \
 	alsa-firmware \
 	alsa-utils \
 	amd-ucode \
@@ -120,14 +119,7 @@ export PACKAGES="\
 	nfs-utils \
 	noto-fonts-emoji \
 	nss-mdns \
-	nvidia-dkms \
-	opencl-nvidia \
-	lib32-opencl-nvidia \
-	nvidia-utils \
-	lib32-nvidia-utils \
-	nvidia-prime \
 	openal \
-	openrazer-daemon \
 	openssh \
 	p7zip \
 	pipewire \
@@ -172,8 +164,8 @@ export PACKAGES="\
 "
 
 export PACKAGE_OVERRIDES="\
-	https://neroreflex.duckdns.org/linux-asus-stable-6.11.0-1-x86_64.pkg.tar.zst \
-	https://neroreflex.duckdns.org/linux-asus-stable-headers-6.11.0-1-x86_64.pkg.tar.zst \
+	https://github.com/NeroReflex/linux-chimeraos/releases/download/asus-linux-stable-v6.11.0-1-fix/linux-asus-stable-6.11.0-1-x86_64.pkg.tar.zst \
+	https://github.com/NeroReflex/linux-chimeraos/releases/download/asus-linux-stable-v6.11.0-1-fix/linux-asus-stable-headers-6.11.0-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.2.0-chos1-1/lib32-libva-mesa-driver-1--24.2.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.2.0-chos1-1/lib32-mesa-1--24.2.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.2.0-chos1-1/lib32-mesa-vdpau-1--24.2.0.chos1-1-x86_64.pkg.tar.zst \
@@ -201,9 +193,6 @@ export PACKAGE_OVERRIDES="\
 # Check on the AUR webpage if you are unsure
 export AUR_PACKAGES="\
 	asusctl-git \
-	ayaneo-platform-dkms-git \
-	ayn-platform-dkms-git \
-	bcm20702a1-firmware \
 	boxtron \
 	chimera \
 	chimeraos-device-quirks-git \
@@ -230,10 +219,6 @@ export AUR_PACKAGES="\
 	powerstation-bin \
 	python-gbopyrator \
 	python-vdf \
-	rtl8812au-dkms-git \
-	rtl8814au-dkms-git \
-	rtl88x2bu-dkms-git \
-	rtl8821au-dkms-git \
 	ryzenadj-git \
 	steam_notif_daemon \
 	steam-powerbuttond-git \
@@ -253,7 +238,6 @@ export SERVICES="\
 	home-swapfile.swap \
 	inputplumber \
 	lightdm \
-	nvidia-powerd \
 	powerstation \
 	steam-powerbuttond \
 	sshd \
