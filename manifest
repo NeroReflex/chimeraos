@@ -164,8 +164,8 @@ export PACKAGES="\
 "
 
 export PACKAGE_OVERRIDES="\
-	https://github.com/NeroReflex/linux-chimeraos/releases/download/asus-linux-stable-v6.11.0-1-fix/linux-asus-stable-6.11.0-1-x86_64.pkg.tar.zst \
-	https://github.com/NeroReflex/linux-chimeraos/releases/download/asus-linux-stable-v6.11.0-1-fix/linux-asus-stable-headers-6.11.0-1-x86_64.pkg.tar.zst \
+	https://github.com/NeroReflex/linux-chimeraos/releases/download/egpu-test/linux-asus-stable-6.11.0-1-x86_64.pkg.tar.zst \
+	https://github.com/NeroReflex/linux-chimeraos/releases/download/egpu-test/linux-asus-stable-headers-6.11.0-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.2.0-chos1-1/lib32-libva-mesa-driver-1--24.2.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.2.0-chos1-1/lib32-mesa-1--24.2.0.chos1-1-x86_64.pkg.tar.zst \
 	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/24.2.0-chos1-1/lib32-mesa-vdpau-1--24.2.0.chos1-1-x86_64.pkg.tar.zst \
