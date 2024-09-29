@@ -203,7 +203,7 @@ export AUR_PACKAGES="\
 	gamescope-session-steam-git \
 	gamescope-session-steam-plus-git \
 	hhfc-git \
-	inputplumber \
+	inputplumber-bin \
 	legendary \
 	libretro-dosbox-pure-git \
 	libretro-opera-git \
