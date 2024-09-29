@@ -235,14 +235,12 @@ export SERVICES="\
 	bluetooth-workaround \
 	fstrim.timer \
 	haveged \
-	home-swapfile.swap \
 	inputplumber \
 	lightdm \
 	powerstation \
 	steam-powerbuttond \
 	sshd \
 	systemd-timesyncd \
-	swapfile \
 "
 
 export USER_SERVICES="\
