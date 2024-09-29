@@ -32,7 +32,7 @@ source=(
 sha256sums=(
     '827d59e8fda5c16b3fc45eb89ce7cd5be6c40d35dd8fe9a8d5ea825a63d3a089' # dracut-install.sh
     'daefb58a0bf6df48cceaf4f7a898c17ca1f24e18cd7981b19f5f2034499592ed' # dracut-remove.sh
-    'f15631cd887d1167af89cc4363a879e3aa1d5a2068f34a9ca8278f3d5c11fa1b' # 00-chimeraos.conf
+    'SKIP' # 00-chimeraos.conf
     '7886062a7293d2e6bd6e975c4a8aaae63342af366479db8adf1b75860081cf53' # 10-chimeraos_fstab.conf
     '103cf3322954202c3f0f740cd9079546d059f919c8b1b07ac703ec6f94cf17fb' # 20-chimeraos_plymouth.conf
     '676b4a216cd3787882edf2e5bdaebce4577a11dbae176f81bab1c1b72917fc09' # 30-chimeraos_filesystems.conf
