@@ -1,0 +1,3 @@
+config HID_MSI_CLAW
+    tristate "MSI Claw gamepad configuration support"
+    depends on USB_HID
