@@ -2,7 +2,7 @@
 
 # Install swapfile
 
-frzr_migration_version=0
+frzr_migration_version=1
 
 post_install() {
     local MOUNT_PATH=$1
