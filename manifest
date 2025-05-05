@@ -211,6 +211,7 @@ export AUR_PACKAGES="\
 	libretro-stella2014-git \
 	libretro-virtualjaguar-git \
 	linux-firmware-valve \
+	login_ng \
 	kanit-font \
 	nintendo-udev \
 	opengamepadui-bin \
@@ -242,6 +243,7 @@ export SERVICES="\
 	inputplumber-suspend \
 	lightdm \
 	nvidia-powerd \
+	pam_login_ng \
 	pcscd.socket \
 	powerstation \
 	steam-powerbuttond \
