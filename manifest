@@ -257,14 +257,6 @@ export USER_SERVICES="\
 	chimera-nfc-monitor.service \
 "
 
-export FILES_TO_DELETE="\
-	/usr/share/SFML \
-	/usr/share/doc \
-	/usr/share/gtk-doc \
-	/usr/share/help \
-	/usr/share/man \
-"
-
 postinstallhook() {
 	# Add sudo permissions
 	sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^# //g' /etc/sudoers
@@ -274,12 +266,6 @@ postinstallhook() {
 	${USERNAME} ALL=(ALL) NOPASSWD: /usr/bin/chimera-session-use-lightdm
 	${USERNAME} ALL=(ALL) NOPASSWD: /usr/share/chimera/bin/power-tool
 	" >/etc/sudoers.d/chimera
-
-	# Remove build tools for slimmer image
-	rm /usr/share/libalpm/hooks/70-dkms-install.hook
-	rm /usr/share/libalpm/hooks/70-dkms-upgrade.hook
-	rm /usr/share/libalpm/hooks/71-dkms-remove.hook
-	pacman --noconfirm -Rnsdd make gcc dkms ${KERNEL_PACKAGE}-headers
 
 	# remove dolphin shortcut to not clutter up the desktop
 	rm /usr/share/applications/dolphin-emu.desktop
