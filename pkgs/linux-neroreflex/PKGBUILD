@@ -1,0 +1,406 @@
+# Maintainer: Denis Benato <benato.denis96@gmail.com>
+# Contributor: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Contributor: Joaquín I. Aramendía (samsagax) <samsagaxg@gmail.com>
+
+pkgbase=linux-neroreflex
+_major=6.14
+pkgver=${_major}.4
+_branch=6.x
+xanmod=1
+_revision="2c335e0c48c82e155d6ce04171bbcbb6505ff9b0"
+_sf_branch=edge
+pkgrel=${xanmod}
+pkgdesc='My Linux branch'
+url="https://gitlab.com/NeroReflex/linux"
+arch=(x86_64)
+license=(GPL2)
+makedepends=(
+  bc
+  cpio
+  gettext
+  libelf
+  pahole
+  perl
+  python
+  tar
+  xz
+  clang
+  llvm
+  lld
+  ccache
+  git
+  rust
+
+  # htmldocs
+  #graphviz
+  #imagemagick
+  #python-sphinx
+  #texlive-latexextra
+)
+options=('!strip')
+
+source=(
+  "https://gitlab.com/xanmod/linux/-/archive/${pkgver}-xanmod${xanmod}.tar.bz2"
+  'config-chimera'
+  'bolt.patch'
+  'bolt-linking.patch'
+  'profile.fdo'
+  '0001-asus.patch'
+  '0001-pci.patch'
+#  '0001-PCI-PM-Put-devices-to-low-power-state-on-shutdown.patch'
+)
+sha256sums=(
+  '42e9ce4b5a3612ab8f66cafcb639544b7e9b8081829f1bff7d14c4043cbad12c' # kernel sources
+  'SKIP'
+  'c016c73b1876b405add30b7aaa802ce689badbb4e348e3dc14e58c5f24274b11' # bolt.patch
+  '92bda1b7b3368e7021b641c5248875c28ca39d8627f4cf71405eb4fb78e1f542' # bolt-linking.patch
+  'SKIP' # profile.fdo
+  'SKIP' # 0001-asus.patch
+  'SKIP' # 0001-pci.patch
+#  'SKIP' # 0001-PCI-PM-Put-devices-to-low-power-state-on-shutdown.patch
+)
+
+validpgpkeys=(
+  ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
+  647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
+  A2FF3A36AAA56654109064AB19802F8B0D70FC30  # Jan Alexander Steffens (heftig)
+  C7E7849466FE2358343588377258734B41C31549  # David Runge <dvzrv@archlinux.org>
+)
+
+export KBUILD_BUILD_HOST=archlinux
+export KBUILD_BUILD_USER=makepkg
+export KBUILD_BUILD_TIMESTAMP=""
+export LLVM=1
+export LLVM_IAS=1
+export CFLAGS="$CFLAGS -mtune=native "
+
+export BASE_CONFIG_PATH="CONFIGS/x86_64/config"
+
+_make() {
+  test -s version
+  if [ -f "$srcdir/profile.fdo" ]; then
+    make LLVM=1 LLVM_IAS=1 CLANG_AUTOFDO_PROFILE=$srcdir/profile.fdo KERNELRELEASE="$(<version)" "$@"
+  else
+    make LLVM=1 LLVM_IAS=1 KERNELRELEASE="$(<version)" "$@"
+  fi
+}
+
+prepare() {
+    ln -sf "$(find "$srcdir" -name "linux-${_major}*" | head -n 1)" "$srcdir/linux"
+    cd "$srcdir/linux"
+
+    echo "Setting version..."
+    echo "${pkgbase#linux}" > localversion.10-pkgname
+    echo "-$pkgrel" > localversion.20-pkgrel
+    make defconfig
+    make -s kernelrelease > version
+    make mrproper
+
+    local src
+    for src in "${source[@]}"; do
+        src="${src%%::*}"
+        src="${src##*/}"
+        src="${src%.zst}"
+        [[ $src = *.patch ]] || continue
+        msg2 "Applying patch $src..."
+        patch -Np1 < "../$src"
+    done
+
+    # Applying configuration
+    echo "Setting config..."
+    cp -vf "$BASE_CONFIG_PATH" .config
+
+    scripts/kconfig/merge_config.sh -m .config ../config-chimera
+
+    scripts/config -e CONFIG_X86_X32_ABI
+    # Kernel traces for better messages
+    scripts/config -e CONFIG_FTRACE \
+                   -e CONFIG_FUNCTION_TRACER \
+                   -e CONFIG_STACK_TRACER
+    scripts/config -e CONFIG_STACK_VALIDATION
+    # Enable IKCONFIG following Arch's philosophy
+    scripts/config -e CONFIG_IKCONFIG \
+                   -e CONFIG_IKCONFIG_PROC
+    scripts/config -e CONFIG_MODULE_COMPRESS
+    scripts/config -e CONFIG_MODULE_COMPRESS_ZSTD
+    scripts/config -e MODULE_DECOMPRESS
+    # Requested by Alexandre Frade to fix issues in python-gbinder
+    scripts/config -e CONFIG_ANDROID_BINDERFS
+    scripts/config -e CONFIG_ANDROID_BINDER_IPC
+    # Additional modules
+    scripts/config -m CONFIG_HID_ASUS_ALLY
+    scripts/config -e CONFIG_ASUS_WMI_BIOS
+    scripts/config -m CONFIG_ASUS_WMI
+    scripts/config -m CONFIG_ASUS_ARMOURY
+    scripts/config -d CONFIG_DRM_RADEON
+    scripts/config -d CONFIG_HYPERVISOR_GUEST
+    scripts/config -d CONFIG_AGP
+    scripts/config -d CONFIG_DRM_MGAG200
+    scripts/config -d CONFIG_REISERFS_FS
+    scripts/config -d CONFIG_DRM_NOUVEAU
+    scripts/config -e CONFIG_DRM_AMD_COLOR_STEAMDECK
+    # this kernel does not run in VMs
+    scripts/config -d CONFIG_VIRT_DRIVERS
+    scripts/config -d CONFIG_DRM_QXL
+    # archlinux does not support selinux
+    scripts/config -d CONFIG_SECURITY_SELINUX
+    # Compress kernel modules
+    scripts/config -e CONFIG_MODULE_COMPRESS \
+                   -e CONFIG_MODULE_COMPRESS_ZSTD \
+                   -e CONFIG_MODULE_DECOMPRESS \
+                   -e MODULE_COMPRESS_ALL
+    # Use CLANG LTO
+    scripts/config -d CONFIG_LTO_CLANG_FULL
+    scripts/config -e CONFIG_LTO_CLANG_THIN
+    # Use CLANG FDO
+    scripts/config -e CONFIG_AUTOFDO_CLANG \
+                   -e CONFIG_PROPELLER_CLANG
+    # Fully randomize structure layout of sensitive kernel data
+    #scripts/config -e CONFIG_RANDSTRUCT_FULL
+    # Use Arch Wiki TOMOYO configuration: https://wiki.archlinux.org/title/TOMOYO_Linux#Installation_2
+    msg2 "Replacing Debian TOMOYO configuration with upstream Arch Linux..."
+    scripts/config --set-str CONFIG_SECURITY_TOMOYO_POLICY_LOADER      "/usr/bin/tomoyo-init"
+    scripts/config --set-str CONFIG_SECURITY_TOMOYO_ACTIVATION_TRIGGER "/usr/lib/systemd/systemd"
+    # Make configuration similar to archlinux default
+    scripts/config -e CONFIG_X86_INTEL_USERCOPY \
+                   -e CONFIG_X86_USE_PPRO_CHECKSUM
+    scripts/config -e CONFIG_SECURITY_LOADPIN_ENFORCE
+    # Remove unused feature
+    scripts/config -d CONFIG_VMWARE_PVSCSI \
+                   -d CONFIG_IPW2100 \
+                   -d CONFIG_IPW2200 \
+                   -d CONFIG_IWL4965 \
+                   -d CONFIG_IWL3945
+    # Newer hardware uses powersave in conjunction with amd-pstate or intel-pstate
+    scripts/config -e CONFIG_CPU_FREQ_DEFAULT_GOV_SCHEDUTIL
+    # Switch away from lazy to identify the performance loss
+    scripts/config -d CONFIG_PREEMPT_LAZY
+    scripts/config -e CONFIG_PREEMPT
+    # use 500Hz tick
+    scripts/config -e CONFIG_HZ_500
+    scripts/config --set-val CONFIG_HZ 500
+    # Archlinux config for task scheduling
+    scripts/config -e CONFIG_NO_HZ_FULL \
+                   -e CONFIG_CONTEXT_TRACKING_USER \
+                   -e CONFIG_NO_HZ
+    # Archlinux general config
+    scripts/config --set-str CONFIG_DEFAULT_HOSTNAME "archlinux"
+    # zswap
+    scripts/config -e CONFIG_ZSWAP_COMPRESSOR_DEFAULT_ZSTD \
+                   -e CONFIG_ZSWAP_ZPOOL_DEFAULT_ZSMALLOC \
+                   -e CONFIG_ZSMALLOC \
+                   -e CONFIG_ZSMALLOC_STAT
+    scripts/config --set-str CONFIG_ZSWAP_ZPOOL_DEFAULT "zsmalloc"
+    # Disable more useless drivers
+    scripts/config -d CONFIG_ENS160 \
+                   -d CONFIG_ENS160_I2C \
+                   -d CONFIG_ENS160_SPI
+    # configure modules as archlinux
+    scripts/config -m CONFIG_JBD2 \
+                   -m CONFIG_FS_MBCACHE \
+                   -m CONFIG_EXT4_FS \
+                   -m CONFIG_BTRFS_FS \
+                   -m CONFIG_FS_ENCRYPTION_ALGS \
+                   -m CONFIG_XOR_BLOCKS \
+                   -m CONFIG_CRYPTO_BLAKE2B \
+                   -m CONFIG_CRYPTO_XXHASH \
+                   -m CONFIG_CRYPTO_CRC32C \
+                   -m CONFIG_CRYPTO_CRC32C_INTEL \
+                   -m CONFIG_CRYPTO_CRC32_PCLMUL \
+                   -m CONFIG_CRYPTO_CRCT10DIF_PCLMUL \
+                   -m CONFIG_RAID6_PQ \
+                   -m CONFIG_CRYPTO_LIB_AESGCM \
+                   -m CONFIG_CRYPTO_LIB_GF128MUL \
+                   -m CONFIG_CRC16 \
+                   -m CONFIG_LIBCRC32C
+    # Make used modules part of the main kernel executable
+    scripts/config -e CONFIG_BT_HCIBTUSB \
+                   -e CONFIG_NVME_CORE \
+                   -e CONFIG_BLK_DEV_NVME \
+                   -e CONFIG_NVME_KEYRING \
+                   -e CONFIG_NVME_AUTH \
+                   -e CONFIG_NVME_FABRICS \
+                   -e CONFIG_NVME_FC \
+                   -e CONFIG_SND_SOC_INTEL_HDA_DSP_COMMON
+
+    # Put back the sane default
+    scripts/config -e CONFIG_IO_STRICT_DEVMEM
+    # link ntsync module into the kernel
+    scripts/config -e CONFIG_NTSYNC
+
+    sed -i 's/--build-id=sha1/--build-id=none/g' Makefile
+
+    # Answer questions with defaults
+    _make olddefconfig
+
+    diff -u "$BASE_CONFIG_PATH" .config || :
+
+    echo "Prepared $pkgbase version $(<version)"
+}
+
+build() {
+    cd "$srcdir/linux"
+    _make all
+}
+
+_package() {
+    pkgdesc="The $pkgdesc kernel and modules"
+    depends=(
+        coreutils
+        initramfs
+        kmod
+    )
+    optdepends=(
+        'wireless-regdb: to set the correct wireless channels of your country'
+        'linux-firmware: firmware images needed for some devices'
+    )
+    provides=(
+        KSMBD-MODULE
+        VIRTUALBOX-GUEST-MODULES
+        WIREGUARD-MODULE
+    )
+    replaces=(
+        virtualbox-guest-modules-arch
+        wireguard-arch
+    )
+
+    cd "$srcdir/linux"
+    local modulesdir="$pkgdir/usr/lib/modules/$(<version)"
+
+    sha256sum "vmlinux.pre-bolt" > "vmlinux.pre-bolt.sha256"
+
+    echo "Installing boot image..."
+    # systemd expects to find the kernel here to allow hibernation
+    # https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
+    install -Dm644 "$(_make -s image_name)" "$modulesdir/vmlinuz"
+
+    # pre-bolt vmlinux file
+    install -Dm644 "vmlinux" "$modulesdir/vmlinux"
+    install -Dm644 "vmlinux.pre-bolt" "$modulesdir/vmlinux.pre-bolt"
+    install -Dm644 "vmlinux.pre-bolt.sha256" "$modulesdir/vmlinux.pre-bolt.sha256"
+
+    # Used by mkinitcpio to name the kernel
+    echo "$pkgbase" | install -Dm644 /dev/stdin "$modulesdir/pkgbase"
+
+    echo "Installing modules..."
+    ZSTD_CLEVEL=19 _make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 \
+        DEPMOD=/doesnt/exist modules_install  # Suppress depmod
+
+    # remove build links
+    rm "$modulesdir"/build
+}
+
+_package-headers() {
+  pkgdesc="Headers and scripts for building modules for the $pkgdesc kernel"
+  depends=(pahole)
+
+  cd "$srcdir/linux"
+  local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
+
+  echo "Installing build files..."
+  install -Dt "$builddir" -m644 .config Makefile Module.symvers System.map \
+    localversion.* version vmlinux
+  install -Dt "$builddir/kernel" -m644 kernel/Makefile
+  install -Dt "$builddir/arch/x86" -m644 arch/x86/Makefile
+  cp -t "$builddir" -a scripts
+
+  # required when STACK_VALIDATION is enabled
+  install -Dt "$builddir/tools/objtool" tools/objtool/objtool
+
+  # required when DEBUG_INFO_BTF_MODULES is enabled
+  install -Dt "$builddir/tools/bpf/resolve_btfids" tools/bpf/resolve_btfids/resolve_btfids
+
+  echo "Installing headers..."
+  cp -t "$builddir" -a include
+  cp -t "$builddir/arch/x86" -a arch/x86/include
+  install -Dt "$builddir/arch/x86/kernel" -m644 arch/x86/kernel/asm-offsets.s
+
+  install -Dt "$builddir/drivers/md" -m644 drivers/md/*.h
+  install -Dt "$builddir/net/mac80211" -m644 net/mac80211/*.h
+
+  # https://bugs.archlinux.org/task/13146
+  install -Dt "$builddir/drivers/media/i2c" -m644 drivers/media/i2c/msp3400-driver.h
+
+  # https://bugs.archlinux.org/task/20402
+  install -Dt "$builddir/drivers/media/usb/dvb-usb" -m644 drivers/media/usb/dvb-usb/*.h
+  install -Dt "$builddir/drivers/media/dvb-frontends" -m644 drivers/media/dvb-frontends/*.h
+  install -Dt "$builddir/drivers/media/tuners" -m644 drivers/media/tuners/*.h
+
+  # https://bugs.archlinux.org/task/71392
+  install -Dt "$builddir/drivers/iio/common/hid-sensors" -m644 drivers/iio/common/hid-sensors/*.h
+
+  echo "Installing KConfig files..."
+  find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
+
+  echo "Removing unneeded architectures..."
+  local arch
+  for arch in "$builddir"/arch/*/; do
+    [[ $arch = */x86/ ]] && continue
+    echo "Removing $(basename "$arch")"
+    rm -r "$arch"
+  done
+
+  echo "Removing documentation..."
+  rm -r "$builddir/Documentation"
+
+  echo "Removing broken symlinks..."
+  find -L "$builddir" -type l -printf 'Removing %P\n' -delete
+
+  echo "Removing loose objects..."
+  find "$builddir" -type f -name '*.o' -printf 'Removing %P\n' -delete
+
+  echo "Stripping build tools..."
+  local file
+  while read -rd '' file; do
+    case "$(file -Sib "$file")" in
+      application/x-sharedlib\;*)      # Libraries (.so)
+        strip -v $STRIP_SHARED "$file" ;;
+      application/x-archive\;*)        # Libraries (.a)
+        strip -v $STRIP_STATIC "$file" ;;
+      application/x-executable\;*)     # Binaries
+        strip -v $STRIP_BINARIES "$file" ;;
+      application/x-pie-executable\;*) # Relocatable binaries
+        strip -v $STRIP_SHARED "$file" ;;
+    esac
+  done < <(find "$builddir" -type f -perm -u+x ! -name vmlinux -print0)
+
+  echo "Stripping vmlinux..."
+  strip -v $STRIP_STATIC "$builddir/vmlinux"
+
+  echo "Adding symlink..."
+  mkdir -p "$pkgdir/usr/src"
+  ln -sr "$builddir" "$pkgdir/usr/src/$pkgbase"
+}
+
+_package-docs() {
+    pkgdesc="Documentation for the $pkgdesc kernel"
+
+    cd "$srcdir/linux"
+    local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
+
+    echo "Installing documentation..."
+    local src dst
+    while read -rd '' src; do
+    dst="${src#Documentation/}"
+    dst="$builddir/Documentation/${dst#output/}"
+    install -Dm644 "$src" "$dst"
+    done < <(find Documentation -name '.*' -prune -o ! -type d -print0)
+
+    echo "Adding symlink..."
+    mkdir -p "$pkgdir/usr/share/doc"
+    ln -sr "$builddir/Documentation" "$pkgdir/usr/share/doc/$pkgbase"
+}
+
+pkgname=(
+  "$pkgbase"
+  "$pkgbase-headers"
+  #"$pkgbase-docs"
+)
+for _p in "${pkgname[@]}"; do
+  eval "package_$_p() {
+    $(declare -f "_package${_p#$pkgbase}")
+    _package${_p#$pkgbase}
+  }"
+done
+
+# vim:set ts=8 sts=2 sw=2 et:

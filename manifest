@@ -10,7 +10,7 @@ export WEBSITE="https://chimeraos.org"
 export DOCUMENTATION_URL="https://chimeraos.org/about"
 export BUG_REPORT_URL="https://github.com/ChimeraOS/chimeraos/issues"
 
-export KERNEL_PACKAGE="linux-chimeraos"
+export KERNEL_PACKAGE="linux-neroreflex"
 export KERNEL_PACKAGE_ORIGIN="local"
 
 export PACKAGES="\

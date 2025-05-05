@@ -1,0 +1,37 @@
+# Maintainer: Denis Benato <benato.denis96@gmail.com>
+
+pkgname=atombutter
+pkgver=0.4.1
+pkgrel=1
+pkgdesc=''
+url='https://github.com/NeroReflex/AtomButter'
+license=("GPLv2")
+makedepends=('cargo')
+depends=()
+arch=('i686' 'x86_64' 'armv6h' 'armv7h')
+source=(
+    "https://github.com/NeroReflex/AtomButter/archive/refs/tags/$pkgver.tar.gz"
+)
+b2sums=(
+    "2b7cffc3fbd5751b9be07b4927dd34da734a07260446df746ba0c8a39ccd2daa2598e8bce4334af195ee2e2ad09e66d61562c1cc99457c5f878b0237e01c5627"
+)
+
+prepare() {
+    export RUSTUP_TOOLCHAIN=stable
+    cd $srcdir/AtomButter-$pkgver
+    cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+    export RUSTUP_TOOLCHAIN=stable
+    export CARGO_TARGET_DIR=target
+    cd $srcdir/AtomButter-$pkgver
+    cargo build --frozen --release --all-features
+}
+
+package() {
+    cd $srcdir/AtomButter-$pkgver
+    install -Dm0755 -t "$pkgdir/usr/bin/" "target/release/$pkgname"
+    # for custom license, e.g. MIT
+    # install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

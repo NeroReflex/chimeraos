@@ -1,0 +1,20 @@
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 56a077d..0c06442 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -309,5 +309,15 @@ if is_enabled CONFIG_KALLSYMS; then
+ 	fi
+ fi
+ 
++# Apply BOLT
++BOLT=llvm-bolt
++BOLT_PROFILE=perf.fdata
++BOLT_OPTS="--dyno-stats --eliminate-unreachable=0 --reorder-blocks=ext-tsp --simplify-conditional-tail-calls=0 --skip-funcs=__entry_text_start,irq_entries_start --split-functions"
++cp -v vmlinux vmlinux.pre-bolt
++if [ -f "$BOLT_PROFILE" ]; then
++	echo BOLTing vmlinux
++	${BOLT} vmlinux.pre-bolt -o vmlinux --data ${BOLT_PROFILE} ${BOLT_OPTS}
++fi
++
+ # For fixdep
+ echo "vmlinux: $0" > .vmlinux.d
