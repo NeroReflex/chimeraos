@@ -60,15 +60,15 @@ cp /etc/pacman.d/mirrorlist rootfs/etc/pacman.d/mirrorlist
 # copy files into chroot
 cp -R manifest rootfs/. ${BUILD_PATH}/
 
-mkdir ${BUILD_PATH}/own_pkgs
-mkdir ${BUILD_PATH}/extra_pkgs
+mkdir ${BUILD_PATH}/local_pkgs
+mkdir ${BUILD_PATH}/aur_pkgs
+mkdir ${BUILD_PATH}/override_pkgs
 
-cp -rv aur-pkgs/*.pkg.tar* ${BUILD_PATH}/extra_pkgs
-cp -rv pkgs/*.pkg.tar* ${BUILD_PATH}/own_pkgs
+cp -rv aur-pkgs/*.pkg.tar* ${BUILD_PATH}/aur_pkgs
+cp -rv pkgs/*.pkg.tar* ${BUILD_PATH}/local_pkgs
 
 if [ -n "${PACKAGE_OVERRIDES}" ]; then
-	wget --directory-prefix=/tmp/extra_pkgs ${PACKAGE_OVERRIDES}
-	cp -rv /tmp/extra_pkgs/*.pkg.tar* ${BUILD_PATH}/own_pkgs
+	wget --directory-prefix=${BUILD_PATH}/override_pkgs ${PACKAGE_OVERRIDES}
 fi
 
 
@@ -107,21 +107,28 @@ sed -i '/OPTIONS/s/ debug/ !debug/g' /etc/makepkg.conf
 # install kernel package
 if [ "$KERNEL_PACKAGE_ORIGIN" == "local" ] ; then
 	pacman --noconfirm -U --overwrite '*' \
-	/own_pkgs/${KERNEL_PACKAGE}-*.pkg.tar.zst 
+	/override_pkgs/${KERNEL_PACKAGE}-*.pkg.tar.zst
 else
 	pacman --noconfirm -S "${KERNEL_PACKAGE}" "${KERNEL_PACKAGE}-headers"
 fi
 
-# install own override packages
-pacman --noconfirm -U --overwrite '*' /own_pkgs/*
+# install local packages
+pacman --noconfirm -U --overwrite '*' /local_pkgs/*
 rm -rf /var/cache/pacman/pkg
+
+# remove jack2 to prevent conflict with pipewire-jack
+pacman --noconfirm -Rdd jack2 || true
 
 # install packages
 pacman --noconfirm -S --overwrite '*' --disable-download-timeout ${PACKAGES}
 rm -rf /var/cache/pacman/pkg
 
 # install AUR packages
-pacman --noconfirm -U --overwrite '*' /extra_pkgs/*
+pacman --noconfirm -U --overwrite '*' /aur_pkgs/*
+rm -rf /var/cache/pacman/pkg
+
+# install override packages
+pacman --noconfirm -U --overwrite '*' /override_pkgs/*
 rm -rf /var/cache/pacman/pkg
 
 # Install the new iptables
@@ -241,8 +248,9 @@ fi
 # the pacman database: it was backed up to another location and
 # will be restored by an unlock hook
 rm -rf \
-/own_pkgs \
-/extra_pkgs \
+/local_pkgs \
+/aur_pkgs \
+/override_pkgs \
 /extra_certs \
 /home \
 /var/log \
