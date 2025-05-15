@@ -1,7 +1,0 @@
-/linux/**
-/src/**
-/pkg/**
-*.tar.zst
-*.tar.bz2
-*.xz
-*.sign
