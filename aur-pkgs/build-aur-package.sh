@@ -80,6 +80,13 @@ build_aur_pkg() {
     fi
   done
 
+  if chown -R build:build "/workdir/aur-pkgs"; then
+    echo "Changed ownership of /workdir/aur-pkgs to build user"
+  else
+    echo "Failed to change ownership of /workdir/aur-pkgs" >&2
+    return 1
+  fi
+
   echo "Building $pkg"
   if sudo -u build bash -c "cd '$srcdir' && PKGDEST=/workdir/aur-pkgs makepkg -s --noconfirm -f"; then
     echo "Built $pkg successfully"
