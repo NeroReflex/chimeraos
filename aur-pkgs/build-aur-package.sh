@@ -52,7 +52,7 @@ build_aur_pkg() {
   fi
 
   deps_raw=$(collect_deps "$srcdir")
-  echo "$deps_raw" > dependencies.txt
+  echo "$deps_raw" | sudo tee dependencies.txt
 
   deps_raw=$(echo "$deps_raw" | tr -d '()",')
 
