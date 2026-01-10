@@ -10,8 +10,21 @@ export WEBSITE="https://chimeraos.org"
 export DOCUMENTATION_URL="https://chimeraos.org/about"
 export BUG_REPORT_URL="https://github.com/ChimeraOS/chimeraos/issues"
 
-export KERNEL_PACKAGE="linux-neroreflex"
-export KERNEL_PACKAGE_ORIGIN="local"
+export KERNEL_PACKAGE="linux"
+export KERNEL_PACKAGE_ORIGIN="upstream"
+
+readonly MESA="
+	mesa \
+	lib32-mesa \
+	opencl-rusticl-mesa \
+	lib32-opencl-rusticl-mesa \
+	vulkan-intel \
+	lib32-vulkan-intel \
+	vulkan-mesa-layers \
+	lib32-vulkan-mesa-layers \
+	vulkan-radeon \
+	lib32-vulkan-radeon \
+"
 
 export PACKAGES="\
 	accountsservice \
@@ -62,6 +75,7 @@ export PACKAGES="\
 	gvfs-nfs \
 	gzip \
 	htop \
+	inputplumber \
 	intel-gpu-tools \
 	intel-media-driver \
 	intel-ucode \
@@ -167,21 +181,10 @@ export PACKAGES="\
 	xorg-server \
 	xz \
 	zip \
+	${MESA} \
 "
 
 export PACKAGE_OVERRIDES="\
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.14.2-chos2-1/linux-chimeraos-6.14.2.chos2-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/linux-chimeraos/releases/download/v6.14.2-chos2-1/linux-chimeraos-headers-6.14.2.chos2-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/lib32-mesa-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/lib32-opencl-rusticl-mesa-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/lib32-vulkan-intel-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/lib32-vulkan-mesa-layers-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/lib32-vulkan-radeon-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/mesa-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/opencl-rusticl-mesa-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/vulkan-intel-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/vulkan-mesa-layers-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
-	https://github.com/ChimeraOS/mesa-chimeraos/releases/download/25.0.3-chos1-1/vulkan-radeon-1--25.0.3.chos1-1-x86_64.pkg.tar.zst \
 	https://archive.archlinux.org/repos/2023/06/28/extra/os/x86_64/libretro-pcsx2-11900-2-x86_64.pkg.tar.zst \
 	https://archive.archlinux.org/packages/l/libretro-mame/libretro-mame-85763-1-x86_64.pkg.tar.zst \
 	https://archive.archlinux.org/packages/r/retroarch/retroarch-1.19.1-3-x86_64.pkg.tar.zst \
@@ -242,15 +245,15 @@ export SERVICES="\
 	fstrim.timer \
 	haveged \
 	inputplumber \
-	inputplumber-suspend \
 	lightdm \
 	nvidia-powerd \
-	pam_login_ng \
+	pam_polyauth \
 	pcscd.socket \
 	powerstation \
 	steam-powerbuttond \
 	sshd \
 	systemd-timesyncd \
+	systemd-sysext \
 "
 
 export USER_SERVICES="\
