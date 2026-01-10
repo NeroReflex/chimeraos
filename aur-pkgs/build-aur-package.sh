@@ -51,42 +51,51 @@ build_aur_pkg() {
     sudo -u build git -C "$srcdir" pull --rebase || true
   fi
 
-  deps_raw=$(collect_deps "$srcdir")
-  echo "$deps_raw" | sudo tee dependencies.txt
+    deps_raw=$(collect_deps "$srcdir")
+    # Save for debugging/inspection
+    printf "%s\n" "$deps_raw" > /tmp/dependencies.txt || true
 
-  deps_raw=$(echo "$deps_raw" | tr -d '()",')
+    echo "Installing dependencies for $pkg:"
+    # Read dependencies into an array, one per line
+    mapfile -t dep_arr < <(printf "%s\n" "$deps_raw" | sed '/^[[:space:]]*$/d') || true
 
-  echo "Installing dependencies for $pkg: $deps_raw"
-  paru -S --noconfirm $(sed -n -e 's/^[[:space:]]*\(make\)\?depends\(_x86_64\)\? = \([[:alnum:][:punct:]]*\)[[:space:]]*$/\3/p' dependencies.txt)
-
-  read -r -a dep_arr <<< "$deps_raw" || true
-
-  for dep in "${dep_arr[@]}"; do
-    [ -z "$dep" ] && continue
-    dep_name="${dep%%[><=]*}"
-    dep_name="${dep_name//\"/}"
-    dep_name="${dep_name//\'/}"
-    if [ -z "$dep_name" ]; then
-      continue
-    fi
-    if already_built "$dep_name"; then
-      echo "Dependency $dep_name already built"
-      continue
-    fi
-    if in_repo "$dep_name"; then
-      echo "Installing repo dependency: $dep_name"
-      paru --noconfirm -S --needed "$dep_name"
-    else
-      echo "Dependency $dep_name not in repo; attempting to build from AUR"
-      if [ "$dep_name" = "$pkg" ]; then
-        echo "Skipping self-dependency for $pkg"
-        continue
-      else
-        paru --noconfirm -S --needed "$dep_name"
+    for dep in "${dep_arr[@]}"; do
+      dep="${dep//\"/}"
+      dep="${dep//\'/}"
+      dep="${dep//,/}"
+      if [ -z "$dep" ]; then
+        # if the raw token is empty after cleanup, skip
+        [ -z "$dep" ] && continue
       fi
-      /workdir/aur-pkgs/build-aur-package.sh "$dep_name"
-    fi
-  done
+      # Strip any version constraints, keep package name only
+      dep_name="${dep%%[><=]*}"
+      dep_name="${dep_name%%:*}" # strip namespace if present
+      dep_name="${dep_name%%/*}"
+
+      [ -z "$dep_name" ] && continue
+
+      if already_built "$dep_name"; then
+        echo "Dependency $dep_name already built; skipping"
+        continue
+      fi
+
+      if in_repo "$dep_name"; then
+        echo "Installing repo dependency: $dep_name"
+        sudo pacman -S --noconfirm --needed "$dep_name" || true
+      else
+        echo "Dependency $dep_name not in repo; building from AUR"
+        if [ "$dep_name" = "$pkg" ]; then
+          echo "Skipping self-dependency for $pkg"
+          continue
+        fi
+        if ! build_aur_pkg "$dep_name"; then
+          echo "Failed to build AUR dependency: $dep_name" >&2
+          return 1
+        fi
+        # Try to install the locally-built package if present
+        sudo pacman -U --noconfirm --needed /workdir/aur-pkgs/*"$dep_name"*.pkg.tar* || true
+      fi
+    done
 
   if sudo chown -R build:build "/workdir/aur-pkgs"; then
     echo "Changed ownership of /workdir/aur-pkgs to build user"
