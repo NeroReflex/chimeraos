@@ -24,13 +24,17 @@ already_built() {
   return 1
 }
 
-in_repo() { paru -Si "$1" >/dev/null 2>&1; }
+in_repo() { pacman -Si "$1" >/dev/null 2>&1; }
 
 collect_deps() {
   local dir="$1"
   local info
   info=$(cd "$dir" && makepkg --printsrcinfo 2>/dev/null) || info=""
-  echo "$info" | awk -F"= " '/^depends =/ {print $2} /^makedepends =/ {print $2}' | tr '\n' ' ' | tr -d '()",'
+  printf "%s\n" "$info" \
+    | sed -nE "s/^[[:space:]]*(depends(_[[:alnum:]]+)?|makedepends)[[:space:]]*=[[:space:]]*(.*)$/\3/p" \
+    | tr ' ' '\\n' \
+    | sed 's/[\",]//g' \
+    | sed '/^[[:space:]]*$/d'
 }
 
 build_aur_pkg() {
