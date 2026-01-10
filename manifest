@@ -170,16 +170,18 @@ export PACKAGES="\
 	xz \
 	zip \
 	mesa \
+	mesa-utils \
+	lib32-mesa-utils \
 	mesa-demos \
 	lib32-mesa \
-	opencl-rusticl-mesa \
-	lib32-opencl-rusticl-mesa \
 	vulkan-intel \
 	lib32-vulkan-intel \
 	vulkan-mesa-layers \
 	lib32-vulkan-mesa-layers \
 	vulkan-radeon \
 	lib32-vulkan-radeon \
+	vulkan-mesa-implicit-layers \
+	lib32-vulkan-mesa-implicit-layers \
 "
 
 # Each entry is the clone url (https://aur.archlinux.org/{AUR_PACKAGE}.git)
