@@ -69,7 +69,7 @@ build_aur_pkg() {
     fi
     if in_repo "$dep_name"; then
       echo "Installing repo dependency: $dep_name"
-      pacman --noconfirm -S --needed "$dep_name" || true
+      paru --noconfirm -S --needed "$dep_name" || true
     else
       echo "Dependency $dep_name not in repo; attempting to build from AUR"
       if [ "$dep_name" = "$pkg" ]; then

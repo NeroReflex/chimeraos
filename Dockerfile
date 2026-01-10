@@ -34,7 +34,10 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
   && \
   pacman --noconfirm -S --needed git && \
   echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-  useradd build -G wheel -m
+  useradd build -G wheel -m && \
+  su - build -c "git clone https://aur.archlinux.org/paru.git /tmp/paru" && \
+  su - build -c "cd /tmp/paru && makepkg -f" && \
+  pacman --noconfirm -U /tmp/paru/*.pkg.tar.zst
 
 # Auto add PGP keys for users
 RUN mkdir -p /etc/gnupg/ && echo -e "keyserver-options auto-key-retrieve" >> /etc/gnupg/gpg.conf
