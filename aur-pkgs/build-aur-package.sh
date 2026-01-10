@@ -37,6 +37,47 @@ collect_deps() {
     | sed '/^[[:space:]]*$/d'
 }
 
+# Resolve the canonical AUR package name for a dependency using the AUR RPC API.
+# Returns the package 'Name' if found, otherwise empty string.
+aur_resolve_name() {
+  local name="$1"
+  local json
+  json=$(curl -fsS "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${name}" 2>/dev/null || true)
+  if [ -n "$json" ]; then
+  # Use python for robust JSON parsing
+  printf "%s" "$json" | python3 - <<'PY'
+import sys, json
+try:
+  j=json.load(sys.stdin)
+except Exception:
+  sys.exit(0)
+r=j.get('results')
+if not r:
+  sys.exit(0)
+if isinstance(r, dict):
+  print(r.get('Name',''))
+elif isinstance(r, list) and len(r)>0:
+  print(r[0].get('Name',''))
+PY
+  return
+  fi
+
+  # fallback: try a search query
+  json=$(curl -fsS "https://aur.archlinux.org/rpc/?v=5&type=search&arg=${name}" 2>/dev/null || true)
+  if [ -n "$json" ]; then
+  printf "%s" "$json" | python3 - <<'PY'
+import sys, json
+try:
+  j=json.load(sys.stdin)
+except Exception:
+  sys.exit(0)
+arr=j.get('results')
+if isinstance(arr, list) and len(arr)>0:
+  print(arr[0].get('Name',''))
+PY
+  fi
+}
+
 build_aur_pkg() {
   local pkg="$1"
   local srcdir="/tmp/aur-src/$pkg"
@@ -46,14 +87,28 @@ build_aur_pkg() {
     return 0
   fi
 
-  if [ ! -d "$srcdir" ]; then
-    sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}.git "$srcdir" || {
-      echo "Failed to clone AUR package: $pkg" >&2
-      return 1
-    }
-  else
-    sudo -u build git -C "$srcdir" pull --rebase || true
-  fi
+    if [ ! -d "$srcdir" ]; then
+      # Resolve canonical AUR repo name (some packages use different pkgbase/name)
+      resolved=$(aur_resolve_name "$pkg" || true)
+      if [ -n "$resolved" ]; then
+        repo_name="$resolved"
+      else
+        repo_name="$pkg"
+      fi
+
+      # Try cloning using resolved name, fallback to tried variants
+      if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${repo_name}.git "$srcdir"; then
+        # try adding -git suffix
+        if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}-git.git "$srcdir"; then
+          if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}.git "$srcdir"; then
+            echo "Failed to clone AUR package: $pkg (tried ${repo_name}, ${pkg}-git, ${pkg})" >&2
+            return 1
+          fi
+        fi
+      fi
+    else
+      sudo -u build git -C "$srcdir" pull --rebase || true
+    fi
 
     deps_raw=$(collect_deps "$srcdir")
     # Save for debugging/inspection
