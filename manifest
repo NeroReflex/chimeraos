@@ -216,7 +216,9 @@ export AUR_PACKAGES="\
 	libretro-stella2014-git \
 	libretro-virtualjaguar-git \
 	linux-firmware-valve \
-	login_ng \
+	login-ng \
+	polyauth \
+	sessionexec \
 	kanit-font \
 	nintendo-udev \
 	opengamepadui-bin \
