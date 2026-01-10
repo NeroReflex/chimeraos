@@ -128,8 +128,10 @@ pacman --noconfirm -U --overwrite '*' /aur_pkgs/*
 rm -rf /var/cache/pacman/pkg
 
 # install override packages
-pacman --noconfirm -U --overwrite '*' /override_pkgs/*
-rm -rf /var/cache/pacman/pkg
+if [ -n "${PACKAGE_OVERRIDES}" ]; then
+	pacman --noconfirm -U --overwrite '*' /override_pkgs/*
+	rm -rf /var/cache/pacman/pkg
+fi
 
 # Install the new iptables
 # See https://gitlab.archlinux.org/archlinux/packaging/packages/iptables/-/issues/1
@@ -255,6 +257,9 @@ rm -rf \
 /home \
 /var/log \
 /var/lib/pacman/local \
+
+# create dummy initramfs file if it does not exist because frzr expects this file to exist
+touch /boot/initramfs-linux.img
 
 # create necessary directories
 mkdir -p /home
