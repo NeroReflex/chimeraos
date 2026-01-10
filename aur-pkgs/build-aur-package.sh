@@ -57,7 +57,7 @@ build_aur_pkg() {
   deps_raw=$(echo "$deps_raw" | tr -d '()",')
 
   echo "Installing dependencies for $pkg: $deps_raw"
-  paru -S -Syu --noconfirm $(sed -n -e 's/^[[:space:]]*\(make\)\?depends\(_x86_64\)\? = \([[:alnum:][:punct:]]*\)[[:space:]]*$/\3/p' dependencies.txt)
+  paru -S --noconfirm $(sed -n -e 's/^[[:space:]]*\(make\)\?depends\(_x86_64\)\? = \([[:alnum:][:punct:]]*\)[[:space:]]*$/\3/p' dependencies.txt)
 
   read -r -a dep_arr <<< "$deps_raw" || true
 
