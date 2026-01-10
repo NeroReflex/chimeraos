@@ -1,6 +1,10 @@
 *.SRCINFO
 *.img.tar.xz
 *.img
+*.pkg.tar.zst
+*.pkg.tar.xz
+*.pkg.tar.gz
+*.log
 .cache/*
 output/*
 rootfs/etc/makepkg.conf

@@ -215,7 +215,6 @@ export AUR_PACKAGES="\
 	sessionrunner \
 	kanit-font \
 	nintendo-udev \
-	pikaur \
 	powerstation-bin \
 	python-gbopyrator \
 	python-vdf \

@@ -9,7 +9,16 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
   pacman --noconfirm -Syyuu && \
   pacman --noconfirm -S \
   arch-install-scripts \
+  base-devel \
   btrfs-progs \
+  cargo \
+  clang \
+  llvm \
+  cmake \
+  cpio \
+  dkms \
+  fakeroot \
+  git \
   fmt \
   xcb-util-wm \
   wget \
@@ -19,24 +28,19 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
   python-flit-core \
   python-installer \
   python-hatchling \
-  python-markdown-it-py \
   python-setuptools \
   python-wheel \
   sudo \
   && \
   pacman --noconfirm -S --needed git && \
   echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-  useradd build -G wheel -m && \
-  su - build -c "git clone https://aur.archlinux.org/pikaur.git /tmp/pikaur" && \
-  su - build -c "cd /tmp/pikaur && makepkg -f" && \
-  pacman --noconfirm -U /tmp/pikaur/pikaur-*.pkg.tar.zst
+  useradd build -G wheel -m
 
 # Auto add PGP keys for users
 RUN mkdir -p /etc/gnupg/ && echo -e "keyserver-options auto-key-retrieve" >> /etc/gnupg/gpg.conf
 
-# Add a fake systemd-run script to workaround pikaur requirement.
-RUN echo -e "#!/bin/bash\nif [[ \"$1\" == \"--version\" ]]; then echo 'fake 244 version'; fi\nmkdir -p /var/cache/pikaur\n" >> /usr/bin/systemd-run && \
-    chmod +x /usr/bin/systemd-run
+# Note: pikaur is no longer used; AUR packages are handled via
+# cloning and `makepkg` in the build scripts.
 
 # substitute check with !check to avoid running software from AUR in the build machine
 # also remove creation of debug packages.
