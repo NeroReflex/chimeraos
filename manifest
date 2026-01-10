@@ -13,22 +13,8 @@ export BUG_REPORT_URL="https://github.com/ChimeraOS/chimeraos/issues"
 export KERNEL_PACKAGE="linux"
 export KERNEL_PACKAGE_ORIGIN="upstream"
 
-readonly MESA="
-	mesa \
-	lib32-mesa \
-	opencl-rusticl-mesa \
-	lib32-opencl-rusticl-mesa \
-	vulkan-intel \
-	lib32-vulkan-intel \
-	vulkan-mesa-layers \
-	lib32-vulkan-mesa-layers \
-	vulkan-radeon \
-	lib32-vulkan-radeon \
-"
-
 export PACKAGES="\
 	accountsservice \
-	acpi_call-dkms \
 	acsccid \
 	alsa-firmware \
 	alsa-utils \
@@ -121,7 +107,6 @@ export PACKAGES="\
 	loupe \
 	lshw \
 	mangohud \
-	mesa-demos \
 	modemmanager \
 	nano \
 	nautilus \
@@ -180,7 +165,17 @@ export PACKAGES="\
 	xorg-server \
 	xz \
 	zip \
-	${MESA} \
+	mesa \
+	mesa-demos \
+	lib32-mesa \
+	opencl-rusticl-mesa \
+	lib32-opencl-rusticl-mesa \
+	vulkan-intel \
+	lib32-vulkan-intel \
+	vulkan-mesa-layers \
+	lib32-vulkan-mesa-layers \
+	vulkan-radeon \
+	lib32-vulkan-radeon \
 "
 
 export PACKAGE_OVERRIDES="\
