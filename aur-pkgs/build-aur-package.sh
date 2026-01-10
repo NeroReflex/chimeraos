@@ -80,7 +80,7 @@ build_aur_pkg() {
     fi
   done
 
-  if chown -R build:build "/workdir/aur-pkgs"; then
+  if sudo chown -R build:build "/workdir/aur-pkgs"; then
     echo "Changed ownership of /workdir/aur-pkgs to build user"
   else
     echo "Failed to change ownership of /workdir/aur-pkgs" >&2
