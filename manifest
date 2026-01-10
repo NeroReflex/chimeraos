@@ -218,7 +218,7 @@ export AUR_PACKAGES="\
 	linux-firmware-valve \
 	login-ng \
 	polyauth \
-	sessionexec \
+	sessionrunner \
 	kanit-font \
 	nintendo-udev \
 	opengamepadui-bin \
