@@ -24,7 +24,7 @@ already_built() {
   return 1
 }
 
-in_repo() { pacman -Si "$1" >/dev/null 2>&1; }
+in_repo() { paru -Si "$1" >/dev/null 2>&1; }
 
 collect_deps() {
   local dir="$1"
@@ -51,8 +51,14 @@ build_aur_pkg() {
     sudo -u build git -C "$srcdir" pull --rebase || true
   fi
 
-  deps_raw=$(collect_deps "$srcdir" || true)
+  deps_raw=$(collect_deps "$srcdir")
+  echo "$deps_raw" > dependencies.txt
+
   deps_raw=$(echo "$deps_raw" | tr -d '()",')
+
+  echo "Installing dependencies for $pkg: $deps_raw"
+  paru -S -Syu --noconfirm $(sed -n -e 's/^[[:space:]]*\(make\)\?depends\(_x86_64\)\? = \([[:alnum:][:punct:]]*\)[[:space:]]*$/\3/p' dependencies.txt)
+
   read -r -a dep_arr <<< "$deps_raw" || true
 
   for dep in "${dep_arr[@]}"; do
@@ -69,14 +75,16 @@ build_aur_pkg() {
     fi
     if in_repo "$dep_name"; then
       echo "Installing repo dependency: $dep_name"
-      paru --noconfirm -S --needed "$dep_name" || true
+      paru --noconfirm -S --needed "$dep_name"
     else
       echo "Dependency $dep_name not in repo; attempting to build from AUR"
       if [ "$dep_name" = "$pkg" ]; then
         echo "Skipping self-dependency for $pkg"
         continue
+      else
+        paru --noconfirm -S --needed "$dep_name"
       fi
-      /workdir/aur-pkgs/build-aur-package.sh "$dep_name" || true
+      /workdir/aur-pkgs/build-aur-package.sh "$dep_name"
     fi
   done
 
