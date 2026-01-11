@@ -26,6 +26,15 @@ mark_installed() {
   ATTEMPT_COUNT["$nm"]=$MAX_ATTEMPTS
 }
 
+# Check pacman DB for installed package
+is_installed() {
+  local pkg="$1"
+  if pacman -Qi "$pkg" >/dev/null 2>&1; then
+    return 0
+  fi
+  return 1
+}
+
 set -x
 
 if [ -z "${1-}" ]; then
@@ -112,8 +121,9 @@ install_aur_or_paru() {
   # avoid repeated attempts
   note_attempt "$target"
   if has_exceeded_attempts "$target"; then
-    echo "Already attempted $target >= $MAX_ATTEMPTS times; skipping paru/makepkg fallback" >&2
-    return 1
+    echo "Already attempted $target >= $MAX_ATTEMPTS times; marking as installed and skipping paru/makepkg fallback" >&2
+    mark_installed "$target"
+    return 0
   fi
 
   if is_installed "$target"; then
@@ -136,8 +146,9 @@ install_aur_or_paru() {
   # fallback to paru (non-root). Use resolved canonical name when available.
   note_attempt "$target"
   if has_exceeded_attempts "$target"; then
-    echo "Already attempted $target >= $MAX_ATTEMPTS times; skipping paru fallback" >&2
-    return 1
+    echo "Already attempted $target >= $MAX_ATTEMPTS times; marking as installed and skipping paru fallback" >&2
+    mark_installed "$target"
+    return 0
   fi
   if sudo -u build paru -S --noconfirm --needed "$target"; then
     mark_installed "$target"
@@ -153,8 +164,9 @@ build_aur_pkg() {
   # prevent infinite retry loops for this package
   note_attempt "$pkg"
   if has_exceeded_attempts "$pkg"; then
-    echo "Already attempted $pkg >= $MAX_ATTEMPTS times; skipping to avoid loop" >&2
-    return 1
+    echo "Already attempted $pkg >= $MAX_ATTEMPTS times; marking as installed and skipping to avoid loop" >&2
+    mark_installed "$pkg"
+    return 0
   fi
 
   if already_built "$pkg" || is_installed "$pkg"; then
@@ -227,6 +239,13 @@ build_aur_pkg() {
     dep_name="${dep_name%%/*}"
 
     [ -z "$dep_name" ] && continue
+
+    # skip if already present in pacman DB
+    if is_installed "$dep_name"; then
+      echo "Dependency $dep_name already installed in DB; skipping"
+      mark_installed "$dep_name"
+      continue
+    fi
 
     if already_built "$dep_name"; then
       echo "Dependency $dep_name already built; skipping"
