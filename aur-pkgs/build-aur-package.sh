@@ -87,6 +87,10 @@ install_aur_or_paru() {
   local resolved
   resolved=$(aur_resolve_name "$name" || true)
   local target=${resolved:-$name}
+  if is_installed "$target"; then
+    echo "Package $target already installed in DB; skipping paru fallback"
+    return 0
+  fi
   if install_aur_via_makepkg "$target"; then
     # install built package(s) if any
     pkg_files=(/workdir/aur-pkgs/*"$target"*.pkg.tar*)
