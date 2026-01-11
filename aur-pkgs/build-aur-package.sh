@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -euo pipefail
+#!/bin/bash
+
+set -euo pipefail
 set -x
 
 if [ -z "${1-}" ]; then
@@ -31,9 +34,9 @@ collect_deps() {
   local info
   info=$(cd "$dir" && makepkg --printsrcinfo 2>/dev/null) || info=""
   printf "%s\n" "$info" \
-    | sed -nE "s/^[[:space:]]*(depends(_[[:alnum:]]+)?|makedepends)[[:space:]]*=[[:space:]]*(.*)$/\3/p" \
+    | sed -nE "s/^[[:space:]]*(depends(_[[:alnum:]]+)?|makedepends)[[:space:]]*=[[:space:]]*(.*)$/\\3/p" \
     | tr ' ' '\\n' \
-    | sed 's/[\",]//g' \
+    | sed 's/[,\"]//g' \
     | sed '/^[[:space:]]*$/d'
 }
 
@@ -44,8 +47,7 @@ aur_resolve_name() {
   local json
   json=$(curl -fsS "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${name}" 2>/dev/null || true)
   if [ -n "$json" ]; then
-  # Use python for robust JSON parsing
-  printf "%s" "$json" | python3 - <<'PY'
+    printf "%s" "$json" | python3 - <<'PY'
 import sys, json
 try:
   j=json.load(sys.stdin)
@@ -59,13 +61,13 @@ if isinstance(r, dict):
 elif isinstance(r, list) and len(r)>0:
   print(r[0].get('Name',''))
 PY
-  return
+    return
   fi
 
   # fallback: try a search query
   json=$(curl -fsS "https://aur.archlinux.org/rpc/?v=5&type=search&arg=${name}" 2>/dev/null || true)
   if [ -n "$json" ]; then
-  printf "%s" "$json" | python3 - <<'PY'
+    printf "%s" "$json" | python3 - <<'PY'
 import sys, json
 try:
   j=json.load(sys.stdin)
@@ -87,139 +89,168 @@ build_aur_pkg() {
     return 0
   fi
 
-    if [ ! -d "$srcdir" ]; then
-      # Resolve canonical AUR repo name (some packages use different pkgbase/name)
-      resolved=$(aur_resolve_name "$pkg" || true)
-      if [ -n "$resolved" ]; then
-        repo_name="$resolved"
-      else
-        repo_name="$pkg"
-      fi
-
-    # If the cloned repo doesn't contain a PKGBUILD (empty AUR repo), try paru as a last-resort
-    if [ ! -f "$srcdir/PKGBUILD" ]; then
-      echo "Cloned AUR repo for $pkg has no PKGBUILD. Trying to satisfy via paru..."
-      if command -v paru >/dev/null 2>&1; then
-        # try to install the package (repo or AUR) non-interactively
-        if sudo paru -S --noconfirm --needed "$pkg"; then
-          echo "Installed $pkg via paru; treating as satisfied"
-          return 0
-        else
-          echo "paru failed to install $pkg; will attempt normal build and may fail" >&2
-        fi
-      else
-        echo "paru not available; cannot fallback for $pkg" >&2
-      fi
-    fi
-
-      # Try cloning using resolved name, fallback to tried variants
-      if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${repo_name}.git "$srcdir"; then
-        # try adding -git suffix
-        if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}-git.git "$srcdir"; then
-          if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}.git "$srcdir"; then
-            echo "Failed to clone AUR package: $pkg (tried ${repo_name}, ${pkg}-git, ${pkg})" >&2
-            return 1
-          fi
-        fi
-      fi
+  if [ ! -d "$srcdir" ]; then
+    # Resolve canonical AUR repo name (some packages use different pkgbase/name)
+    resolved=$(aur_resolve_name "$pkg" || true)
+    if [ -n "$resolved" ]; then
+      repo_name="$resolved"
     else
-      sudo -u build git -C "$srcdir" pull --rebase || true
+      repo_name="$pkg"
     fi
 
-    deps_raw=$(collect_deps "$srcdir")
-    # Save for debugging/inspection
-    printf "%s\n" "$deps_raw" > /tmp/dependencies.txt || true
-
-    echo "Installing dependencies for $pkg:"
-    # Read dependencies into an array, one per line
-    mapfile -t dep_arr < <(printf "%s\n" "$deps_raw" | sed '/^[[:space:]]*$/d') || true
-
-    for dep in "${dep_arr[@]}"; do
-      dep="${dep//\"/}"
-      dep="${dep//\'/}"
-      dep="${dep//,/}"
-      if [ -z "$dep" ]; then
-        # if the raw token is empty after cleanup, skip
-        [ -z "$dep" ] && continue
-      fi
-      # Strip any version constraints, keep package name only
-      dep_name="${dep%%[><=]*}"
-      dep_name="${dep_name%%:*}" # strip namespace if present
-      dep_name="${dep_name%%/*}"
-
-      [ -z "$dep_name" ] && continue
-
-      if already_built "$dep_name"; then
-        echo "Dependency $dep_name already built; skipping"
-        continue
-      fi
-
-      if in_repo "$dep_name"; then
-        echo "Installing repo dependency: $dep_name"
-        sudo paru -S --noconfirm --needed "$dep_name" || true
-      else
-        # Heuristics for sonames / virtual libs: skip or map to known repo packages
-        if [[ "$dep_name" == *.* ]]; then
-          # tokens like libfmt.so, libzip.so — try to map or skip
-          echo "Dependency $dep_name looks like a soname or file; attempting to map or skip"
-          case "$dep_name" in
-            libgl)
-              mapped_pkg=mesa
-              ;;
-            libGL.so*|libGL*)
-              mapped_pkg=mesa
-              ;;
-            libfmt.so*)
-              mapped_pkg=fmt9
-              ;;
-            libzip.so*)
-              mapped_pkg=libzip
-              ;;
-            libzstd.so*)
-              mapped_pkg=zstd
-              ;;
-            libryml.so*)
-              mapped_pkg=rapidyaml
-              ;;
-            *)
-              mapped_pkg=""
-              ;;
-          esac
-          if [ -n "$mapped_pkg" ]; then
-            echo "Mapping $dep_name -> $mapped_pkg and installing"
-            sudo paru -S --noconfirm --needed "$mapped_pkg" || true
-            continue
-          else
-            echo "No mapping for $dep_name; assuming provided by base system or skipped"
-            continue
-          fi
-        fi
-
-        echo "Dependency $dep_name not in repo; building from AUR"
-        if [ "$dep_name" = "$pkg" ]; then
-          echo "Skipping self-dependency for $pkg"
-          continue
-        fi
-        if ! build_aur_pkg "$dep_name"; then
-          echo "Failed to build AUR dependency: $dep_name" >&2
+    # Try cloning using resolved name, fallback to tried variants
+    if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${repo_name}.git "$srcdir"; then
+      # try adding -git suffix
+      if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}-git.git "$srcdir"; then
+        if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${pkg}.git "$srcdir"; then
+          echo "Failed to clone AUR package: $pkg (tried ${repo_name}, ${pkg}-git, ${pkg})" >&2
+          # If clone failed, attempt paru fallback as build user
           if command -v paru >/dev/null 2>&1; then
-            echo "Attempting to install $dep_name via paru as a last-resort"
-            if sudo paru -S --noconfirm --needed "$dep_name"; then
-              echo "Installed $dep_name via paru; continuing"
-              continue
+            paru_target="$pkg"
+            resolved_paru=$(aur_resolve_name "$pkg" || true)
+            if [ -n "$resolved_paru" ]; then
+              paru_target="$resolved_paru"
+            fi
+            if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
+              echo "Installed $paru_target via paru after clone failure; treating as satisfied"
+              return 0
             else
-              echo "paru failed to install $dep_name" >&2
+              echo "paru fallback failed for $paru_target" >&2
             fi
           fi
           return 1
         fi
-        # Try to install the locally-built package if present
-        pkg_files=(/workdir/aur-pkgs/*"$dep_name"*.pkg.tar*)
-        if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
-          sudo paru -U --noconfirm --needed "${pkg_files[@]}" || true
+      fi
+    fi
+  else
+    sudo -u build git -C "$srcdir" pull --rebase || true
+  fi
+
+  # If the cloned repo doesn't contain a PKGBUILD (empty AUR repo), try paru as a last-resort
+  if [ ! -f "$srcdir/PKGBUILD" ]; then
+    echo "Cloned AUR repo for $pkg has no PKGBUILD. Trying to satisfy via paru..."
+    if command -v paru >/dev/null 2>&1; then
+      paru_target="$pkg"
+      resolved_paru=$(aur_resolve_name "$pkg" || true)
+      if [ -n "$resolved_paru" ]; then
+        paru_target="$resolved_paru"
+      fi
+      if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
+        echo "Installed $paru_target via paru; treating as satisfied"
+        return 0
+      else
+        echo "paru failed to install $paru_target; will attempt normal build and may fail" >&2
+      fi
+    else
+      echo "paru not available; cannot fallback for $pkg" >&2
+    fi
+  fi
+
+  deps_raw=$(collect_deps "$srcdir") || deps_raw=""
+  # Save for debugging/inspection
+  printf "%s\n" "$deps_raw" > /tmp/dependencies.txt || true
+
+  echo "Installing dependencies for $pkg:"
+  # Read dependencies into an array, one per line
+  mapfile -t dep_arr < <(printf "%s\n" "$deps_raw" | sed '/^[[:space:]]*$/d') || true
+
+  for dep in "${dep_arr[@]}"; do
+    dep="${dep//\\\"/}"
+    dep="${dep//\\'/}"
+    dep="${dep//,/}"
+    if [ -z "$dep" ]; then
+      continue
+    fi
+
+    dep_name="${dep%%[><=]*}"
+    dep_name="${dep_name%%:*}"
+    dep_name="${dep_name%%/*}"
+
+    [ -z "$dep_name" ] && continue
+
+    if already_built "$dep_name"; then
+      echo "Dependency $dep_name already built; skipping"
+      continue
+    fi
+
+    # Prefer paru for installs (handles AUR).
+    if in_repo "$dep_name"; then
+      echo "Installing repo dependency: $dep_name"
+      paru_target="$dep_name"
+      resolved_paru=$(aur_resolve_name "$dep_name" || true)
+      if [ -n "$resolved_paru" ]; then
+        paru_target="$resolved_paru"
+      fi
+      sudo -u build paru -S --noconfirm --needed "$paru_target" || true
+    else
+      # Heuristics for sonames / virtual libs: skip or map to known repo packages
+      if [[ "$dep_name" == *.* ]]; then
+        echo "Dependency $dep_name looks like a soname or file; attempting to map or skip"
+        case "$dep_name" in
+          libgl)
+            mapped_pkg=mesa
+            ;;
+          libGL.so*|libGL*)
+            mapped_pkg=mesa
+            ;;
+          libfmt.so*)
+            mapped_pkg=fmt9
+            ;;
+          libzip.so*)
+            mapped_pkg=libzip
+            ;;
+          libzstd.so*)
+            mapped_pkg=zstd
+            ;;
+          libryml.so*)
+            mapped_pkg=rapidyaml
+            ;;
+          *)
+            mapped_pkg=""
+            ;;
+        esac
+        if [ -n "$mapped_pkg" ]; then
+          echo "Mapping $dep_name -> $mapped_pkg and installing"
+          sudo -u build paru -S --noconfirm --needed "$mapped_pkg" || true
+          continue
+        else
+          echo "No mapping for $dep_name; assuming provided by base system or skipped"
+          continue
         fi
       fi
-    done
+
+      echo "Dependency $dep_name not in repo; building from AUR"
+      if [ "$dep_name" = "$pkg" ]; then
+        echo "Skipping self-dependency for $pkg"
+        continue
+      fi
+
+      if ! build_aur_pkg "$dep_name"; then
+        echo "Failed to build AUR dependency: $dep_name" >&2
+        if command -v paru >/dev/null 2>&1; then
+          echo "Attempting to install $dep_name via paru as a last-resort"
+          paru_target="$dep_name"
+          resolved_paru=$(aur_resolve_name "$dep_name" || true)
+          if [ -n "$resolved_paru" ]; then
+            paru_target="$resolved_paru"
+          fi
+          if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
+            echo "Installed $paru_target via paru; continuing"
+            continue
+          else
+            echo "paru failed to install $paru_target" >&2
+          fi
+        fi
+        return 1
+      fi
+
+      # Try to install the locally-built package if present
+      pkg_files=(/workdir/aur-pkgs/*"$dep_name"*.pkg.tar*)
+      if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
+        sudo -u build paru -U --noconfirm --needed "${pkg_files[@]}" || true
+      fi
+    fi
+  done
 
   if sudo chown -R build:build "/workdir/aur-pkgs"; then
     echo "Changed ownership of /workdir/aur-pkgs to build user"
@@ -250,3 +281,10 @@ else
   echo "Failed to build $PKGNAME after dependency resolution" >&2
   exit 1
 fi
+          echo "Built $pkg successfully"
+          return 0
+        else
+          echo "Build failed for $pkg" >&2
+          return 1
+        fi
+      }
