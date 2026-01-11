@@ -142,6 +142,43 @@ build_aur_pkg() {
         echo "Installing repo dependency: $dep_name"
         sudo pacman -S --noconfirm --needed "$dep_name" || true
       else
+        # Heuristics for sonames / virtual libs: skip or map to known repo packages
+        if [[ "$dep_name" == *.* ]]; then
+          # tokens like libfmt.so, libzip.so — try to map or skip
+          echo "Dependency $dep_name looks like a soname or file; attempting to map or skip"
+          case "$dep_name" in
+            libgl)
+              mapped_pkg=mesa
+              ;;
+            libGL.so*|libGL*)
+              mapped_pkg=mesa
+              ;;
+            libfmt.so*)
+              mapped_pkg=fmt9
+              ;;
+            libzip.so*)
+              mapped_pkg=libzip
+              ;;
+            libzstd.so*)
+              mapped_pkg=zstd
+              ;;
+            libryml.so*)
+              mapped_pkg=rapidyaml
+              ;;
+            *)
+              mapped_pkg=""
+              ;;
+          esac
+          if [ -n "$mapped_pkg" ]; then
+            echo "Mapping $dep_name -> $mapped_pkg and installing"
+            sudo pacman -S --noconfirm --needed "$mapped_pkg" || true
+            continue
+          else
+            echo "No mapping for $dep_name; assuming provided by base system or skipped"
+            continue
+          fi
+        fi
+
         echo "Dependency $dep_name not in repo; building from AUR"
         if [ "$dep_name" = "$pkg" ]; then
           echo "Skipping self-dependency for $pkg"
@@ -152,7 +189,10 @@ build_aur_pkg() {
           return 1
         fi
         # Try to install the locally-built package if present
-        sudo pacman -U --noconfirm --needed /workdir/aur-pkgs/*"$dep_name"*.pkg.tar* || true
+        pkg_files=(/workdir/aur-pkgs/*"$dep_name"*.pkg.tar*)
+        if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
+          sudo pacman -U --noconfirm --needed "${pkg_files[@]}" || true
+        fi
       fi
     done
 
