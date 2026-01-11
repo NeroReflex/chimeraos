@@ -156,7 +156,7 @@ build_aur_pkg() {
 
       if in_repo "$dep_name"; then
         echo "Installing repo dependency: $dep_name"
-        sudo pacman -S --noconfirm --needed "$dep_name" || true
+        sudo paru -S --noconfirm --needed "$dep_name" || true
       else
         # Heuristics for sonames / virtual libs: skip or map to known repo packages
         if [[ "$dep_name" == *.* ]]; then
@@ -187,7 +187,7 @@ build_aur_pkg() {
           esac
           if [ -n "$mapped_pkg" ]; then
             echo "Mapping $dep_name -> $mapped_pkg and installing"
-            sudo pacman -S --noconfirm --needed "$mapped_pkg" || true
+            sudo paru -S --noconfirm --needed "$mapped_pkg" || true
             continue
           else
             echo "No mapping for $dep_name; assuming provided by base system or skipped"
@@ -216,7 +216,7 @@ build_aur_pkg() {
         # Try to install the locally-built package if present
         pkg_files=(/workdir/aur-pkgs/*"$dep_name"*.pkg.tar*)
         if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
-          sudo pacman -U --noconfirm --needed "${pkg_files[@]}" || true
+          sudo paru -U --noconfirm --needed "${pkg_files[@]}" || true
         fi
       fi
     done
