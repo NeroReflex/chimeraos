@@ -281,10 +281,3 @@ else
   echo "Failed to build $PKGNAME after dependency resolution" >&2
   exit 1
 fi
-          echo "Built $pkg successfully"
-          return 0
-        else
-          echo "Build failed for $pkg" >&2
-          return 1
-        fi
-      }
