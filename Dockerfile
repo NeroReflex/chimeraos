@@ -42,9 +42,6 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
 # Auto add PGP keys for users
 RUN mkdir -p /etc/gnupg/ && echo -e "keyserver-options auto-key-retrieve" >> /etc/gnupg/gpg.conf
 
-# Note: pikaur is no longer used; AUR packages are handled via
-# cloning and `makepkg` in the build scripts.
-
 # substitute check with !check to avoid running software from AUR in the build machine
 # also remove creation of debug packages.
 RUN sed -i '/BUILDENV/s/check/!check/g' /etc/makepkg.conf && \
