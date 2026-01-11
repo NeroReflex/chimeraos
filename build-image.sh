@@ -98,8 +98,10 @@ sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 # update package databases
 pacman --noconfirm -Syy
 
-# Avoid mkintcpio being auto-installed while installing the kernel (we want dracut)
-pacman -S --noconfirm dracut
+# Avoid mkintcpio being auto-installed while installing the kernel
+# install local packages
+pacman --noconfirm -U --overwrite '*' /local_pkgs/*mkinitcpio*
+
 # Disable check and debug for makepkg on the final image
 sed -i '/BUILDENV/s/ check/ !check/g' /etc/makepkg.conf
 sed -i '/OPTIONS/s/ debug/ !debug/g' /etc/makepkg.conf

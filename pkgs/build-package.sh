@@ -4,11 +4,6 @@ set -x
 
 sudo chown -R build:build /workdir/pkgs
 
-# ChimeraOS now uses dracut and excludes mkinitcpio due to pacman hooks causing problems
-# Ensure package conflicting with mkinitcpio can be built
-sudo pacman -S --noconfirm dracut
-sudo pacman -R --noconfirm mkinitcpio
-
 # Build package from local PKGBUILD
 sudo -u build bash -c "cd /workdir/${1} && PKGDEST=/workdir/pkgs paru -Bi --needed --noconfirm ."
 # remove any epoch (:) in name, replace with -- since not allowed in artifacts

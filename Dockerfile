@@ -22,7 +22,6 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
   fmt \
   xcb-util-wm \
   wget \
-  mkinitcpio \
   pyalpm \
   python \
   python-build \
