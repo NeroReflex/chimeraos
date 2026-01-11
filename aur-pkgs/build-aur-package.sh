@@ -43,6 +43,27 @@ aur_resolve_name() {
   python3 "$(dirname "$0")/aur_resolve.py" "$name" || true
 }
 
+parse_pkgbuild_deps() {
+  local dir="$1"
+  local pkgb="$dir/PKGBUILD"
+  [ -f "$pkgb" ] || return 0
+  python3 - "$pkgb" <<'PY'
+import re,sys
+p=sys.argv[1]
+try:
+    s=open(p,'r',encoding='utf-8',errors='ignore').read()
+except Exception:
+    sys.exit(0)
+out=[]
+for key in ('depends','makedepends'):
+    for m in re.finditer(r'(?ms)'+key+r'\s*=\s*\((.*?)\)', s):
+        inner=m.group(1)
+        parts=re.findall(r'["\']?([^"\',\s]+)["\']?', inner)
+        out.extend(parts)
+print('\n'.join(out))
+PY
+}
+
 install_aur_via_makepkg() {
   local target="$1"
   local src="/tmp/aur-src/$target"
@@ -132,6 +153,9 @@ build_aur_pkg() {
   fi
 
   deps_raw=$(collect_deps "$srcdir") || deps_raw=""
+  if [ -z "${deps_raw:-}" ]; then
+    deps_raw=$(parse_pkgbuild_deps "$srcdir" 2>/dev/null || true)
+  fi
   printf "%s\n" "$deps_raw" > /tmp/dependencies.txt || true
 
   echo "Installing dependencies for $pkg:"
@@ -222,8 +246,24 @@ build_aur_pkg() {
     echo "Warning: unable to chown /workdir/aur-pkgs; continuing" >&2
   fi
 
+  # Install any already-built local artifacts so pacman/makepkg can
+  # resolve dependencies against them without hitting remote repos.
+  shopt -s nullglob
+  prebuilt=(/workdir/aur-pkgs/*.pkg.tar*)
+  if [ ${#prebuilt[@]} -gt 0 ] && [ -e "${prebuilt[0]}" ]; then
+    echo "Installing existing local packages into DB: ${#prebuilt[@]} files"
+    sudo -u build paru -U --noconfirm --needed "${prebuilt[@]}" || true
+  fi
+
   echo "Building $pkg"
   if sudo -u build bash -c "cd $srcdir && PKGDEST=/workdir/aur-pkgs makepkg -s --noconfirm -f"; then
+    # Install any locally-built package files so downstream makepkg/pacman
+    # can find them as dependencies without prompting.
+    pkg_files=(/workdir/aur-pkgs/*"$pkg"*.pkg.tar*)
+    if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
+      sudo -u build paru -U --noconfirm --needed "${pkg_files[@]}" || true
+    fi
+
     echo "Built $pkg successfully"
     return 0
   else
