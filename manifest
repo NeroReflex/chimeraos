@@ -101,7 +101,6 @@ export PACKAGES="\
 	libretro-snes9x \
 	libxcrypt-compat \
 	libxss \
-	lightdm \
 	linux-firmware \
 	liquidctl \
 	logrotate \
@@ -236,7 +235,6 @@ export SERVICES="\
 	bluetooth-workaround \
 	fstrim.timer \
 	inputplumber \
-	lightdm \
 	nvidia-powerd \
 	pam_polyauth \
 	pcscd.socket \
@@ -262,7 +260,6 @@ postinstallhook() {
 	echo "${USERNAME} ALL=(ALL) NOPASSWD: /usr/bin/dmidecode -t 11
 	" >/etc/sudoers.d/steam
 	echo "
-	${USERNAME} ALL=(ALL) NOPASSWD: /usr/bin/chimera-session-use-lightdm
 	${USERNAME} ALL=(ALL) NOPASSWD: /usr/share/chimera/bin/power-tool
 	" >/etc/sudoers.d/chimera
 
