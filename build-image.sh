@@ -78,10 +78,6 @@ arch-chroot ${BUILD_PATH} /bin/bash <<EOF
 set -e
 set -x
 
-# This will prevent frzr bootloader from erroring when installing kernels
-# due to the pacman hook being executed at kernel-install time
-export FRZR_IMAGE_GENERATION=1
-
 source /manifest
 
 pacman-key --populate
@@ -152,12 +148,9 @@ systemctl --global enable ${USER_SERVICES}
 # disable root login
 passwd --lock root
 
-# add root to the frzr group
-sudo usermod -a -G frzr root
-
 # create user
 groupadd -r autologin
-useradd -m ${USERNAME} -G autologin,wheel,plugdev,frzr
+useradd -m ${USERNAME} -G autologin,wheel,plugdev
 echo "${USERNAME}:${USERNAME}" | chpasswd
 
 # set the default editor, so visudo works
@@ -183,10 +176,9 @@ Subsystem	sftp	/usr/lib/ssh/sftp-server
 " > /etc/ssh/sshd_config
 
 # Write the fstab file
-# NOTE: gid=379 is the group ID of the frzr group
 # WARNING: mounting partitions using LABEL exposes us to a bug where multiple disks cannot have frzr systems and how to solve this still is an open question
 echo "
-LABEL=frzr_efi           /efi       vfat      uid=0,gid=379,fmask=0077,dmask=0077,rw,noatime,nofail                                                                                                                                                                                                                                                                                                                                                               0   2
+LABEL=frzr_efi           /efi       vfat      uid=0,fmask=0077,dmask=0077,rw,noatime,nofail                                                                                                                                                                                                                                                                                                                                                               0   2
 LABEL=frzr_root          /frzr_root btrfs     defaults,x-initrd.mount,subvolid=5,rw,noatime                                                                                                                                                                                                                                                                                                                                                                       0   2
 LABEL=frzr_root          /home      btrfs     defaults,x-systemd.rw-only,subvol=/home,rw,noatime,nofail                                                                                                                                                                                                                                                                                                                                                           0   0
 overlay                  /root      overlay   defaults,x-systemd.requires-mounts-for=/frzr_root,x-systemd.requires-mounts-for=/sysroot/frzr_root,x-initrd.mount,lowerdir=/sysroot/root,upperdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/root_overlay/upperdir,workdir=/sysroot/frzr_root/deployments_data/${SYSTEM_NAME}-${VERSION}/root_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,comment=rootoverlay               0   0
@@ -232,19 +224,6 @@ mv /var/lib/pacman /usr/var/lib/
 # Remove the fallback: it is never used and takes up space
 if [ -e "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img" ]; then
 	rm "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img"
-fi
-
-# Since frzr pre-v1.0.0 has an hardcoded cp of /boot/vmlinuz-linux and /boot/initramfs-linux.img
-# create two empty files so that the cp command won't fail: these will be  replaced by a migration hook.
-#
-# Note: The following is kept for compatibility with older frzr
-# 		This can safely be removed when the compatibility with
-# 		frzr pre-v1.0.0 will be dropped
-if [ "${KERNEL_PACKAGE}" = "linux" ]; then
-	echo "Kernel is named 'linux' nothing to do."
-else
-	touch /boot/vmlinuz-linux
-	touch /boot/initramfs-linux.img
 fi
 
 # clean up/remove unnecessary files

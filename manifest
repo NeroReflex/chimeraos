@@ -197,7 +197,6 @@ export AUR_PACKAGES="\
 	chimeraos-device-quirks-git \
 	downgrade \
 	evdev-keepalive \
-	frzr-git \
 	gpd-fan-driver-dkms-git \
 	hhfc-git \
 	hid-msi-claw-dkms-git \
