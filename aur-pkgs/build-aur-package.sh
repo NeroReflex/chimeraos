@@ -95,7 +95,6 @@ build_aur_pkg() {
       else
         repo_name="$pkg"
       fi
-    fi
 
     # If the cloned repo doesn't contain a PKGBUILD (empty AUR repo), try paru as a last-resort
     if [ ! -f "$srcdir/PKGBUILD" ]; then
