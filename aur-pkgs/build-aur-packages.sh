@@ -12,5 +12,5 @@ sudo chown build:build /workdir/aur-pkgs
 for PKG in ${AUR_PACKAGES}; do
 	echo "Processing AUR package: ${PKG}"
 	sudo -u build git clone --depth=1 https://aur.archlinux.org/${PKG}.git /tmp/${PKG} || { echo "clone failed for ${PKG}"; continue; }
-	sudo -u build bash -c "cd /tmp/${PKG} && PKGDEST=/workdir/aur-pkgs makepkg -o --noconfirm || true"
+	sudo -u build bash -c "paru -B --needed --noconfirm /tmp/${PKG}"
 done
