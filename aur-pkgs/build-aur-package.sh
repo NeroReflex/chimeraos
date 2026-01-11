@@ -95,6 +95,23 @@ build_aur_pkg() {
       else
         repo_name="$pkg"
       fi
+    fi
+
+    # If the cloned repo doesn't contain a PKGBUILD (empty AUR repo), try paru as a last-resort
+    if [ ! -f "$srcdir/PKGBUILD" ]; then
+      echo "Cloned AUR repo for $pkg has no PKGBUILD. Trying to satisfy via paru..."
+      if command -v paru >/dev/null 2>&1; then
+        # try to install the package (repo or AUR) non-interactively
+        if sudo paru -S --noconfirm --needed "$pkg"; then
+          echo "Installed $pkg via paru; treating as satisfied"
+          return 0
+        else
+          echo "paru failed to install $pkg; will attempt normal build and may fail" >&2
+        fi
+      else
+        echo "paru not available; cannot fallback for $pkg" >&2
+      fi
+    fi
 
       # Try cloning using resolved name, fallback to tried variants
       if ! sudo -u build git clone --depth=1 https://aur.archlinux.org/${repo_name}.git "$srcdir"; then
@@ -186,6 +203,15 @@ build_aur_pkg() {
         fi
         if ! build_aur_pkg "$dep_name"; then
           echo "Failed to build AUR dependency: $dep_name" >&2
+          if command -v paru >/dev/null 2>&1; then
+            echo "Attempting to install $dep_name via paru as a last-resort"
+            if sudo paru -S --noconfirm --needed "$dep_name"; then
+              echo "Installed $dep_name via paru; continuing"
+              continue
+            else
+              echo "paru failed to install $dep_name" >&2
+            fi
+          fi
           return 1
         fi
         # Try to install the locally-built package if present
