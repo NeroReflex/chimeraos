@@ -43,6 +43,42 @@ aur_resolve_name() {
   python3 "$(dirname "$0")/aur_resolve.py" "$name" || true
 }
 
+install_aur_via_makepkg() {
+  local target="$1"
+  local src="/tmp/aur-src/$target"
+  if [ -d "$src" ]; then
+    sudo -u build git -C "$src" pull --rebase || true
+  else
+    if ! sudo -u build git clone --depth=1 "https://aur.archlinux.org/${target}.git" "$src"; then
+      return 1
+    fi
+  fi
+  if [ -f "$src/PKGBUILD" ]; then
+    if sudo -u build bash -c "cd $src && PKGDEST=/workdir/aur-pkgs makepkg -s --noconfirm -f"; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+install_aur_or_paru() {
+  local name="$1"
+  local resolved
+  resolved=$(aur_resolve_name "$name" || true)
+  local target=${resolved:-$name}
+  if install_aur_via_makepkg "$target"; then
+    # install built package(s) if any
+    pkg_files=(/workdir/aur-pkgs/*"$target"*.pkg.tar*)
+    if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
+      sudo -u build paru -U --noconfirm --needed "${pkg_files[@]}" || true
+    fi
+    return 0
+  fi
+
+  # fallback to paru (non-root). Use resolved canonical name when available.
+  sudo -u build paru -S --noconfirm --needed "$target" || return 1
+}
+
 build_aur_pkg() {
   local pkg="$1"
   local srcdir="/tmp/aur-src/$pkg"
@@ -66,16 +102,11 @@ build_aur_pkg() {
         if ! sudo -u build git clone --depth=1 "https://aur.archlinux.org/${pkg}.git" "$srcdir"; then
           echo "Failed to clone AUR package: $pkg (tried ${repo_name}, ${pkg}-git, ${pkg})" >&2
           if command -v paru >/dev/null 2>&1; then
-            paru_target="$pkg"
-            resolved_paru=$(aur_resolve_name "$pkg" || true)
-            if [ -n "$resolved_paru" ]; then
-              paru_target="$resolved_paru"
-            fi
-            if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
-              echo "Installed $paru_target via paru after clone failure; treating as satisfied"
+            if install_aur_or_paru "$pkg"; then
+              echo "Installed $pkg via fallback; treating as satisfied"
               return 0
             else
-              echo "paru fallback failed for $paru_target" >&2
+              echo "paru/install fallback failed for $pkg" >&2
             fi
           fi
           return 1
@@ -89,16 +120,11 @@ build_aur_pkg() {
   if [ ! -f "$srcdir/PKGBUILD" ]; then
     echo "Cloned AUR repo for $pkg has no PKGBUILD. Trying paru fallback..."
     if command -v paru >/dev/null 2>&1; then
-      paru_target="$pkg"
-      resolved_paru=$(aur_resolve_name "$pkg" || true)
-      if [ -n "$resolved_paru" ]; then
-        paru_target="$resolved_paru"
-      fi
-      if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
-        echo "Installed $paru_target via paru; treating as satisfied"
+      if install_aur_or_paru "$pkg"; then
+        echo "Installed $pkg via fallback; treating as satisfied"
         return 0
       else
-        echo "paru failed to install $paru_target; will attempt normal build and may fail" >&2
+        echo "paru/install fallback failed for $pkg; will attempt normal build and may fail" >&2
       fi
     else
       echo "paru not available; cannot fallback for $pkg" >&2
@@ -173,11 +199,11 @@ build_aur_pkg() {
           if [ -n "$resolved_paru" ]; then
             paru_target="$resolved_paru"
           fi
-          if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
-            echo "Installed $paru_target via paru; continuing"
+          if install_aur_or_paru "$paru_target"; then
+            echo "Installed $paru_target via fallback; continuing"
             continue
           else
-            echo "paru failed to install $paru_target" >&2
+            echo "paru/install failed to install $paru_target" >&2
           fi
         fi
         return 1
