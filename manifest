@@ -235,7 +235,6 @@ export SERVICES="\
 	bluetooth \
 	bluetooth-workaround \
 	fstrim.timer \
-	haveged \
 	inputplumber \
 	lightdm \
 	nvidia-powerd \
