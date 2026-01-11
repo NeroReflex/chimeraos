@@ -4,6 +4,28 @@ set -euo pipefail
 #!/usr/bin/env bash
 
 set -euo pipefail
+declare -A ATTEMPT_COUNT
+MAX_ATTEMPTS=2
+
+# Attempt tracking helpers to avoid recursive reinstall loops
+note_attempt() {
+  local nm="$1"
+  ATTEMPT_COUNT["$nm"]=$(( ${ATTEMPT_COUNT["$nm"]:-0} + 1 ))
+}
+
+has_exceeded_attempts() {
+  local nm="$1"
+  if [ ${ATTEMPT_COUNT["$nm"]:-0} -ge "$MAX_ATTEMPTS" ]; then
+    return 0
+  fi
+  return 1
+}
+
+mark_installed() {
+  local nm="$1"
+  ATTEMPT_COUNT["$nm"]=$MAX_ATTEMPTS
+}
+
 set -x
 
 if [ -z "${1-}" ]; then
@@ -87,29 +109,57 @@ install_aur_or_paru() {
   local resolved
   resolved=$(aur_resolve_name "$name" || true)
   local target=${resolved:-$name}
+  # avoid repeated attempts
+  note_attempt "$target"
+  if has_exceeded_attempts "$target"; then
+    echo "Already attempted $target >= $MAX_ATTEMPTS times; skipping paru/makepkg fallback" >&2
+    return 1
+  fi
+
   if is_installed "$target"; then
     echo "Package $target already installed in DB; skipping paru fallback"
+    mark_installed "$target"
     return 0
   fi
+
   if install_aur_via_makepkg "$target"; then
     # install built package(s) if any
     pkg_files=(/workdir/aur-pkgs/*"$target"*.pkg.tar*)
     if [ ${#pkg_files[@]} -gt 0 ] && [ -e "${pkg_files[0]}" ]; then
-      sudo -u build paru -U --noconfirm --needed "${pkg_files[@]}" || true
+      if sudo -u build paru -U --noconfirm --needed "${pkg_files[@]}"; then
+        mark_installed "$target"
+      fi
     fi
     return 0
   fi
 
   # fallback to paru (non-root). Use resolved canonical name when available.
-  sudo -u build paru -S --noconfirm --needed "$target" || return 1
+  note_attempt "$target"
+  if has_exceeded_attempts "$target"; then
+    echo "Already attempted $target >= $MAX_ATTEMPTS times; skipping paru fallback" >&2
+    return 1
+  fi
+  if sudo -u build paru -S --noconfirm --needed "$target"; then
+    mark_installed "$target"
+    return 0
+  fi
+  return 1
 }
 
 build_aur_pkg() {
   local pkg="$1"
   local srcdir="/tmp/aur-src/$pkg"
 
-  if already_built "$pkg"; then
-    echo "$pkg already built; skipping"
+  # prevent infinite retry loops for this package
+  note_attempt "$pkg"
+  if has_exceeded_attempts "$pkg"; then
+    echo "Already attempted $pkg >= $MAX_ATTEMPTS times; skipping to avoid loop" >&2
+    return 1
+  fi
+
+  if already_built "$pkg" || is_installed "$pkg"; then
+    echo "$pkg already built or installed; skipping"
+    mark_installed "$pkg"
     return 0
   fi
 
@@ -190,7 +240,20 @@ build_aur_pkg() {
       if [ -n "$resolved_paru" ]; then
         paru_target="$resolved_paru"
       fi
-      sudo -u build paru -S --noconfirm --needed "$paru_target" || true
+      if is_installed "$paru_target"; then
+        echo "Repo dependency $paru_target already installed; skipping"
+      else
+        note_attempt "$paru_target"
+        if has_exceeded_attempts "$paru_target"; then
+          echo "Already attempted $paru_target >= $MAX_ATTEMPTS times; skipping repo install" >&2
+        else
+          if sudo -u build paru -S --noconfirm --needed "$paru_target"; then
+            mark_installed "$paru_target"
+          else
+            echo "paru failed to install $paru_target (ignored)" >&2
+          fi
+        fi
+      fi
     else
       if [[ "$dep_name" == *.* ]]; then
         echo "Dependency $dep_name looks like a soname or file; attempting to map or skip"
