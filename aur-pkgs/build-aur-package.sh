@@ -12,7 +12,7 @@ sudo chown build:build /workdir/aur-pkgs
 
 git clone --depth=1 https://aur.archlinux.org/${1}.git /temp/package
 
-PIKAUR_CMD="PKGDEST=/workdir/aur-pkgs paru --noconfirm --build-gpgdir /etc/pacman.d/gnupg -S -B /temp/package"
+PIKAUR_CMD="PKGDEST=/workdir/aur-pkgs paru --noconfirm -Bi /temp/package"
 PIKAUR_RUN=(bash -c "${PIKAUR_CMD}")
 "${PIKAUR_RUN[@]}"
 # if aur package is not successfully built, exit
