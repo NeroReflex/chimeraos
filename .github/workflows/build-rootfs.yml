@@ -68,5 +68,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: rootfs
-            path: output/*
             compression-level: 0
+            path: |
+              output/${{ steps.build_rootfs.outputs.rootfs }}
+              output/build_info.txt
+
