@@ -197,6 +197,9 @@ export PACKAGES="\
 	zellij \
 	eza \
 	bat \
+	helix \
+	nushell \
+	alacritty \
 "
 
 # Each entry is the clone url (https://aur.archlinux.org/{AUR_PACKAGE}.git)
