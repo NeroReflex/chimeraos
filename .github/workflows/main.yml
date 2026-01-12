@@ -112,11 +112,19 @@ jobs:
             path: pkgs/*.pkg.tar*
             compression-level: 0
 
-  build:
+  rootfs:
     needs:
      - build-docker-image
      - aur-pkgbuild
      - pkgbuild
+    name: Build ChimeraOS UNSTABLE rootfs
+    uses: ./.github/workflows/build-rootfs.yml
+    with:
+      postfix: "[UNSTABLE]"
+
+  build:
+    needs:
+     - rootfs
     name: Build ChimeraOS UNSTABLE image
     uses: ./.github/workflows/build-system-image.yml
     with:
