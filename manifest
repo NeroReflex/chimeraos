@@ -46,18 +46,6 @@ export PACKAGES="\
 	fwupd \
 	gamescope \
 	git \
-	gnome-browser-connector \
-	gnome-console \
-	gnome-control-center \
-	gnome-disk-utility \
-	gnome-keyring \
-	gnome-menus \
-	gnome-session \
-	gnome-shell \
-	gnome-software \
-	gnome-system-monitor \
-	gnome-text-editor \
-	gnome-tweaks \
 	gst-plugin-pipewire \
 	gvfs-smb \
 	gvfs-nfs \
@@ -162,11 +150,9 @@ export PACKAGES="\
 	wireless-regdb \
 	wqy-zenhei \
 	xdg-desktop-portal \
-	xdg-desktop-portal-gnome \
+	xdg-desktop-portal-gtk \
 	xdg-desktop-portal-wlr \
 	xdg-user-dirs-gtk \
-	xf86-video-amdgpu \
-	xorg-server \
 	xz \
 	zip \
 	mesa \
@@ -182,6 +168,35 @@ export PACKAGES="\
 	lib32-vulkan-radeon \
 	vulkan-mesa-implicit-layers \
 	lib32-vulkan-mesa-implicit-layers \
+	cosmic-launcher \
+	cosmic-app-library \
+	cosmic-applets \
+	cosmic-bg \
+	cosmic-comp \
+	cosmic-files \
+	cosmic-greeter \
+	cosmic-icon-theme \
+	cosmic-idle \
+	cosmic-initial-setup \
+	cosmic-launcher \
+	cosmic-notifications \
+	cosmic-osd \
+	cosmic-panel \
+	cosmic-player \
+	cosmic-randr \
+	cosmic-screenshot \
+	cosmic-session \
+	cosmic-settings \
+	cosmic-settings-daemon \
+	cosmic-wallpapers \
+	cosmic-store \
+	cosmic-terminal \
+	cosmic-text-editor \
+	cosmic-workspaces \
+	xdg-desktop-portal-cosmic \
+	zellij \
+	eza \
+	bat \
 "
 
 # Each entry is the clone url (https://aur.archlinux.org/{AUR_PACKAGE}.git)
@@ -272,13 +287,6 @@ postinstallhook() {
 	find /usr/share/applications/* |
 		grep -v org.chimeraos.Gamescope.desktop |
 		grep -v org.chimeraos.app.desktop |
-		grep -v org.gnome.Console.desktop |
-		grep -v org.gnome.DiskUtility.desktop |
-		grep -v org.gnome.FileRoller.desktop |
-		grep -v org.gnome.Nautilus.desktop |
-		grep -v org.gnome.Settings.desktop |
-		grep -v org.gnome.Software.desktop |
-		grep -v org.gnome.TextEditor.desktop |
 		grep -v steam.desktop |
 		xargs -I {} sh -c "echo NoDisplay=true >> {}"
 
