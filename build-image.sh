@@ -64,7 +64,7 @@ if [ ! -n "$TARFILE" ]; then
 fi
 
 # placeholder to kick off the x86_64 detection of the script
-touch "grub-efi-bootx64.efi"
+touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 # Build the image properly
 bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
