@@ -126,7 +126,7 @@ if [ -z "${NO_COMPRESS}" ]; then
 	cat sha256sum.txt
 
 	# Move the image to the output directory, if one was specified.
-	if [ -n "${OUTPUT_DIR}" ]; then
+	if [ -n "${OUTPUT_DIR:-}" ]; then
 		mkdir -p "${OUTPUT_DIR}"
 		mv ${IMG_FILENAME} ${OUTPUT_DIR}
 		mv build_info.txt ${OUTPUT_DIR}
@@ -144,7 +144,7 @@ if [ -z "${NO_COMPRESS}" ]; then
 	fi
 else
 	echo "Local build, output IMG directly"
-	if [ -n "${OUTPUT_DIR}" ]; then
+	if [ -n "${OUTPUT_DIR:-}" ]; then
 		mkdir -p "${OUTPUT_DIR}"
 		mv ${SYSTEM_NAME}-${VERSION}.img ${OUTPUT_DIR}
 	fi

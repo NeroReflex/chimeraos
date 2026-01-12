@@ -258,8 +258,13 @@ if [ -z "${ARCHIVE_DATE}" ]; then
 fi
 
 readonly ROOTFS_DATE=$(date +%Y%m%d)
-readonly ROOTFS_TAR="${OUTPUT_DIR}/${SYSTEM_NAME}-rootfs-${VERSION}-${ROOTFS_DATE}.tar.gz"
+readonly ROOTFS_TAR="${SYSTEM_NAME}-rootfs-${VERSION}-${ROOTFS_DATE}.tar.gz"
 tar cfz "${ROOTFS_TAR}" -C "${BUILD_PATH}" .
+
+if [ -n "${OUTPUT_DIR:-}" ]; then
+	mkdir -p "${OUTPUT_DIR}"
+	mv "${ROOTFS_TAR}" "${OUTPUT_DIR}"
+fi
 
 # set outputs for github actions
 if [ -f "${GITHUB_OUTPUT}" ]; then
