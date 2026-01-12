@@ -12,13 +12,14 @@ sudo chown build:build /workdir/aur-pkgs
 
 git clone --depth=1 https://aur.archlinux.org/${1}.git /temp/package
 
-BUILD_AUR_CMD="PKGDEST=/workdir/aur-pkgs paru --noconfirm -Bi /temp/package"
-BUILD_AUR_RUN=(bash -c "${BUILD_AUR_CMD}")
+readonly BUILD_AUR_CMD="PKGDEST=/workdir/aur-pkgs paru --noconfirm -Bi /temp/package"
+readonly BUILD_AUR_RUN=(bash -c "${BUILD_AUR_CMD}")
 "${BUILD_AUR_RUN[@]}"
 # if aur package is not successfully built, exit
 if [ $? -ne 0 ]; then
     echo "Build failed. Stopping..."
     exit -1
 fi
+
 # remove any epoch (:) in name, replace with -- since not allowed in artifacts
 find /workdir/aur-pkgs/*.pkg.tar* -type f -name '*:*' -execdir bash -c 'mv "$1" "${1//:/--}"' bash {} \;
