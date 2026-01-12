@@ -235,9 +235,6 @@ export AUR_PACKAGES="\
 	powerstation-bin \
 	python-gbopyrator \
 	python-vdf \
-	rtl8812au-dkms-git \
-	rtl8814au-dkms-git \
-	rtl8821au-dkms-git \
 	ryzenadj-git \
 	steam_notif_daemon \
 	steam-powerbuttond-git \
