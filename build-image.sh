@@ -108,7 +108,7 @@ rm -rf ${MOUNT_PATH}
 rm -rf ${BUILD_IMG}
 
 IMG_FILENAME="${SYSTEM_NAME}-${VERSION}.img.tar.xz"
-if [ -z "${NO_COMPRESS}" ]; then
+if [ -z "${NO_COMPRESS:-}" ]; then
 	# This can be used only when installing from the refactored frzr
 	# Maximizes the github building space and makes the build faster
 	#
@@ -133,7 +133,7 @@ if [ -z "${NO_COMPRESS}" ]; then
 	fi
 
 	# set outputs for github actions
-	if [ -f "${GITHUB_OUTPUT}" ]; then
+	if [ -f "${GITHUB_OUTPUT:-}" ]; then
 		echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
 		echo "display_version=${DISPLAY_VERSION}" >> "${GITHUB_OUTPUT}"
 		echo "display_name=${SYSTEM_DESC}" >> "${GITHUB_OUTPUT}"
