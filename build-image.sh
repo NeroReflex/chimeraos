@@ -48,19 +48,22 @@ mount -t btrfs -o loop,compress-force=zstd:15 ${BUILD_IMG} ${MOUNT_PATH}
 btrfs subvolume create ${BUILD_PATH}
 
 # If a prebuilt rootfs tar was provided (downloaded into /tmp/rootfs by the workflow),
-# extract it directly into the btrfs subvolume and skip the expensive pacstrap/arch-chroot.
-SKIP_CHROOT=0
+# extract it directly into the btrfs subvolume, otherwise error out
 if [ ! -d /tmp/rootfs ]; then
-	echo "No prebuilt rootfs found, performing pacstrap and arch-chroot"
+	echo "No prebuilt rootfs found"
 	exit
 fi
+
+ls -lah /tmp/rootfs
 
 TARFILE=$(ls /tmp/rootfs 2>/dev/null | head -n1 || true)
 if [ -n "$TARFILE" ]; then
 	echo "Found rootfs archive: /tmp/rootfs/$TARFILE — extracting into ${BUILD_PATH}"
 	# Use -a so tar auto-detects compression from suffix
 	tar -xaf /tmp/rootfs/$TARFILE -C ${BUILD_PATH}
-	SKIP_CHROOT=1
+else
+	echo "No rootfs archive found in /tmp/rootfs"
+	exit
 fi
 
 # When rootfs tar was used, ensure package folders exist inside the build path
@@ -70,10 +73,9 @@ mkdir -p ${BUILD_PATH}/override_pkgs
 cp -R manifest ${BUILD_PATH}/ || true
 cp -rv aur-pkgs/*.pkg.tar* ${BUILD_PATH}/aur_pkgs || true
 cp -rv pkgs/*.pkg.tar* ${BUILD_PATH}/local_pkgs || true
-	if [ -n "${PACKAGE_OVERRIDES}" ]; then
-		wget --directory-prefix=${BUILD_PATH}/override_pkgs ${PACKAGE_OVERRIDES} || true
-	fi
-
+if [ -n "${PACKAGE_OVERRIDES}" ]; then
+	wget --directory-prefix=${BUILD_PATH}/override_pkgs ${PACKAGE_OVERRIDES} || true
+fi
 
 #defrag the image
 btrfs filesystem defragment -r ${BUILD_PATH}
