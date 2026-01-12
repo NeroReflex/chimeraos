@@ -67,8 +67,10 @@ mkdir ${BUILD_PATH}/override_pkgs
 cp -rv aur-pkgs/*.pkg.tar* ${BUILD_PATH}/aur_pkgs
 cp -rv pkgs/*.pkg.tar* ${BUILD_PATH}/local_pkgs
 
-if [ -n "${PACKAGE_OVERRIDES}" ]; then
-	wget --directory-prefix=${BUILD_PATH}/override_pkgs ${PACKAGE_OVERRIDES}
+if [ -n "${PACKAGE_OVERRIDES:-}" ]; then
+    wget --directory-prefix=${BUILD_PATH}/override_pkgs "${PACKAGE_OVERRIDES}"
+else
+	echo "No override packages to install"
 fi
 
 # chroot into target
@@ -125,9 +127,11 @@ pacman --noconfirm -U --overwrite '*' /aur_pkgs/*
 rm -rf /var/cache/pacman/pkg
 
 # install override packages
-if [ -n "${PACKAGE_OVERRIDES}" ]; then
-	pacman --noconfirm -U --overwrite '*' /override_pkgs/*
-	rm -rf /var/cache/pacman/pkg
+if [ -n "${PACKAGE_OVERRIDES:-}" ]; then
+    pacman --noconfirm -U --overwrite '*' /override_pkgs/*
+    rm -rf /var/cache/pacman/pkg
+else
+	echo "No override packages to install"
 fi
 
 # Install the new iptables

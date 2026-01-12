@@ -1,6 +1,6 @@
 #! /bin/bash
 
-set -e
+set -euo pipefail
 set -x
 
 if [ $EUID -ne 0 ]; then
@@ -73,7 +73,7 @@ mkdir -p ${BUILD_PATH}/override_pkgs
 cp -R manifest ${BUILD_PATH}/ || true
 cp -rv aur-pkgs/*.pkg.tar* ${BUILD_PATH}/aur_pkgs || true
 cp -rv pkgs/*.pkg.tar* ${BUILD_PATH}/local_pkgs || true
-if [ -n "${PACKAGE_OVERRIDES}" ]; then
+if [ -n "${PACKAGE_OVERRIDES:-}" ]; then
 	wget --directory-prefix=${BUILD_PATH}/override_pkgs ${PACKAGE_OVERRIDES} || true
 fi
 
