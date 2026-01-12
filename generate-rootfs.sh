@@ -264,6 +264,7 @@ tar cfz "${ROOTFS_TAR}" -C "${BUILD_PATH}" .
 if [ -n "${OUTPUT_DIR:-}" ]; then
 	mkdir -p "${OUTPUT_DIR}"
 	mv "${ROOTFS_TAR}" "${OUTPUT_DIR}"
+	cp "${BUILD_PATH}/build_info" "${OUTPUT_DIR}/build_info.txt"
 fi
 
 # set outputs for github actions
