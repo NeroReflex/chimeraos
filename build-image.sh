@@ -11,7 +11,6 @@ fi
 BUILD_USER=${BUILD_USER:-}
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
-
 source manifest
 
 if [ -z "${SYSTEM_NAME}" ]; then
@@ -25,14 +24,11 @@ if [ -z "${VERSION}" ]; then
 fi
 
 DISPLAY_VERSION=${VERSION}
-LSB_VERSION=${VERSION}
 VERSION_NUMBER=${VERSION}
 
 if [ -n "$1" ]; then
 	DISPLAY_VERSION="${VERSION} (${1})"
 	VERSION="${VERSION}_${1}"
-	LSB_VERSION="${LSB_VERSION}　(${1})"
-	BUILD_ID="${1}"
 fi
 
 MOUNT_PATH=/tmp/${SYSTEM_NAME}-build
@@ -127,9 +123,9 @@ if [ -z "${NO_COMPRESS:-}" ]; then
 	# Move the image to the output directory, if one was specified.
 	if [ -n "${OUTPUT_DIR:-}" ]; then
 		mkdir -p "${OUTPUT_DIR}"
-		mv ${IMG_FILENAME} ${OUTPUT_DIR}
-		mv build_info.txt ${OUTPUT_DIR}
-		mv sha256sum.txt ${OUTPUT_DIR}
+		mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
+		mv "build_info.txt" "${OUTPUT_DIR}/"
+		mv "sha256sum.txt" "${OUTPUT_DIR}/"
 	fi
 
 	# set outputs for github actions
