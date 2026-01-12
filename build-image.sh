@@ -217,11 +217,6 @@ pacman -Q > /manifest
 mkdir -p /usr/var/lib/
 mv /var/lib/pacman /usr/var/lib/
 
-# Remove the fallback: it is never used and takes up space
-if [ -e "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img" ]; then
-	rm "/boot/initramfs-${KERNEL_PACKAGE}-fallback.img"
-fi
-
 # clean up/remove unnecessary files
 # Keep every file in /var except for logs (populated by GitHub CI)
 # the pacman database: it was backed up to another location and
@@ -234,9 +229,6 @@ rm -rf \
 /home \
 /var/log \
 /var/lib/pacman/local \
-
-# create dummy initramfs file if it does not exist because frzr expects this file to exist
-touch /boot/initramfs-linux.img
 
 # create necessary directories
 mkdir -p /home
