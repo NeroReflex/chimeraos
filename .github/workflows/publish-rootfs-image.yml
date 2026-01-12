@@ -73,11 +73,10 @@ jobs:
           echo "ARTIFACT=$ARTIFACT" >> image.env
           echo "IMAGE_BASE=$IMAGE_BASE" >> image.env
 
-          cat > Dockerfile <<EOF
-FROM scratch
-ADD ${ARTIFACT} /
-CMD ["/bin/sh"]
-EOF
+          echo "FROM scratch" > Dockerfile
+          echo "ADD ${ARTIFACT} /" >> Dockerfile
+          echo "CMD ["/bin/sh"]" >> Dockerfile
+          echo "EOF" >> Dockerfile
 
       - name: Build and push image to GHCR
         run: |
