@@ -122,6 +122,12 @@ jobs:
     with:
       postfix: "[UNSTABLE]"
 
+  publish-rootfs-image:
+    needs:
+     - rootfs
+    name: Publish RootFS Image
+    uses: ./.github/workflows/publish-rootfs-image.yml
+
   build:
     needs:
      - rootfs

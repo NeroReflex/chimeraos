@@ -1,0 +1,90 @@
+name: Publish RootFS Image
+
+on:
+  workflow_call: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download rootfs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: rootfs
+          path: /tmp/rootfs
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Dockerfile and derive image name
+        id: prepare
+        run: |
+          set -euo pipefail
+          ARTIFACT=$(ls /tmp/rootfs | grep -E '\.tar(\.gz|\.bz2|\.xz)?$' || true)
+          if [ -z "$ARTIFACT" ]; then
+            echo "No tarball artifact found in /tmp/rootfs/"; exit 1
+          fi
+          cp "/tmp/rootfs/$ARTIFACT" .
+
+          # Try to locate /etc/os-release inside the tarball
+          FILE_PATH=$(tar -tf "$ARTIFACT" | grep -E '/etc/os-release$' | head -n1 || true)
+          if [ -n "$FILE_PATH" ]; then
+            OSREL=$(tar -xOf "$ARTIFACT" "$FILE_PATH")
+          else
+            FILE_PATH=$(tar -tf "$ARTIFACT" | grep -E '^etc/os-release$' | head -n1 || true)
+            if [ -n "$FILE_PATH" ]; then
+              OSREL=$(tar -xOf "$ARTIFACT" "$FILE_PATH")
+            else
+              echo "Warning: /etc/os-release not found inside tarball; using generic name" >&2
+              OSREL='PRETTY_NAME="rootfs"\nVERSION_ID="latest"'
+            fi
+          fi
+
+          NAME=$(echo "$OSREL" | sed -n "s/^NAME=\(.*\)/\1/p" | tr -d '"')
+          VERSION_ID=$(echo "$OSREL" | sed -n "s/^VERSION_ID=\(.*\)/\1/p" | tr -d '"')
+          if [ -z "$NAME" ]; then
+            NAME=$(echo "$OSREL" | sed -n "s/^PRETTY_NAME=\(.*\)/\1/p" | tr -d '"')
+          fi
+          if [ -z "$VERSION_ID" ]; then
+            VERSION_ID="latest"
+          fi
+
+          # sanitize for image name
+          SAFE_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]+/-/g' | sed 's/^-\|-$//g')
+          SAFE_VERSION=$(echo "$VERSION_ID" | tr -cs '[:alnum:].' '-')
+
+          IMAGE_BASE="ghcr.io/${{ github.repository_owner }}/${SAFE_NAME}-${SAFE_VERSION}"
+
+          echo "ARTIFACT=$ARTIFACT" >> image.env
+          echo "IMAGE_BASE=$IMAGE_BASE" >> image.env
+
+          cat > Dockerfile <<EOF
+FROM scratch
+ADD ${ARTIFACT} /
+CMD ["/bin/sh"]
+EOF
+
+      - name: Build and push image to GHCR
+        run: |
+          set -euo pipefail
+          . ./image.env
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t ${IMAGE_BASE}:${{ github.sha }} \
+            -t ${IMAGE_BASE}:latest \
+            --push .
