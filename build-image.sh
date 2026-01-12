@@ -11,6 +11,14 @@ fi
 BUILD_USER=${BUILD_USER:-}
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
+readonly BASE_DIR=$(pwd)
+readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
+
+git clone https://github.com/NeroReflex/embedded_quickstart.git
+pushd embedded_quickstart
+git checkout scarthgap
+popd
+
 source manifest
 
 if [ -z "${SYSTEM_NAME}" ]; then
@@ -31,18 +39,6 @@ if [ -n "$1" ]; then
 	VERSION="${VERSION}_${1}"
 fi
 
-MOUNT_PATH=/tmp/${SYSTEM_NAME}-build
-BUILD_PATH=${MOUNT_PATH}/subvolume
-SNAP_PATH=${MOUNT_PATH}/${SYSTEM_NAME}-${VERSION}
-BUILD_IMG=/output/${SYSTEM_NAME}-build.img
-
-mkdir -p ${MOUNT_PATH}
-
-fallocate -l ${SIZE} ${BUILD_IMG}
-mkfs.btrfs -f ${BUILD_IMG}
-mount -t btrfs -o loop,compress-force=zstd:15 ${BUILD_IMG} ${MOUNT_PATH}
-btrfs subvolume create ${BUILD_PATH}
-
 # If a prebuilt rootfs tar was provided (downloaded into /tmp/rootfs by the workflow),
 # extract it directly into the btrfs subvolume, otherwise error out
 if [ ! -d /tmp/rootfs ]; then
@@ -53,24 +49,32 @@ fi
 ls -lah /tmp/rootfs
 
 TARFILE=$(ls /tmp/rootfs 2>/dev/null | head -n1 || true)
-if [ -n "$TARFILE" ]; then
-	echo "Found rootfs archive: /tmp/rootfs/$TARFILE — extracting into ${BUILD_PATH}"
-	# Use -a so tar auto-detects compression from suffix
-	tar -xaf /tmp/rootfs/$TARFILE -C ${BUILD_PATH}
-else
+if [ ! -n "$TARFILE" ]; then
 	echo "No rootfs archive found in /tmp/rootfs"
 	exit
 fi
 
-# When rootfs tar was used, ensure package folders exist inside the build path
-mkdir -p ${BUILD_PATH}/local_pkgs
-mkdir -p ${BUILD_PATH}/aur_pkgs
-mkdir -p ${BUILD_PATH}/override_pkgs
-cp -R manifest ${BUILD_PATH}/ || true
-cp -rv aur-pkgs/*.pkg.tar* ${BUILD_PATH}/aur_pkgs || true
-cp -rv pkgs/*.pkg.tar* ${BUILD_PATH}/local_pkgs || true
-if [ -n "${PACKAGE_OVERRIDES:-}" ]; then
-	wget --directory-prefix=${BUILD_PATH}/override_pkgs ${PACKAGE_OVERRIDES} || true
+# placeholder to kick off the x86_64 detection of the script
+touch "grub-efi-bootx64.efi"
+
+# Build the image properly
+bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "/tmp/rootfs" "${SYSTEM_NAME}-${VERSION}"
+
+mv "disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
+
+ls -lah .
+
+sha256sum "$IMG_FILENAME" > sha256sum.txt
+cat sha256sum.txt
+
+# Move the image to the output directory, if one was specified.
+if [ -n "${OUTPUT_DIR:-}" ]; then
+	mkdir -p "${OUTPUT_DIR}"
+	mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
+	mv "build_info.txt" "${OUTPUT_DIR}/"
+	mv "sha256sum.txt" "${OUTPUT_DIR}/"
 fi
 
 #defrag the image
@@ -138,9 +142,5 @@ if [ -z "${NO_COMPRESS:-}" ]; then
 		echo "No github output file set"
 	fi
 else
-	echo "Local build, output IMG directly"
-	if [ -n "${OUTPUT_DIR:-}" ]; then
-		mkdir -p "${OUTPUT_DIR}"
-		mv ${SYSTEM_NAME}-${VERSION}.img ${OUTPUT_DIR}
-	fi
+	echo "No github output file set"
 fi
