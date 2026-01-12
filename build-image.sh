@@ -70,13 +70,19 @@ touch "grub-efi-bootx64.efi"
 bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
 
 mv "disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+
+# cleanup any leftover rootfs tars
+rm -f ${IMAGE_DIR}/*rootfs*.tar*
+
+# compress the resulting image
 xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}.img"
 IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
 
-ls -lah .
-
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 cat sha256sum.txt
+
+# Debugging info
+ls -lah .
 
 # Move the image to the output directory, if one was specified.
 if [ -n "${OUTPUT_DIR:-}" ]; then
