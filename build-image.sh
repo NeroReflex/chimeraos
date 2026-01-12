@@ -11,6 +11,19 @@ fi
 BUILD_USER=${BUILD_USER:-}
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
+# Install needed software
+sudo pacman -S --noconfirm install \
+	btrfs-progs \
+	dosfstools \
+	gzip \
+	lsb-release \
+	mtools \
+	parted \
+	qemu-img \
+	xz \
+	zstd \
+	sbsigntools
+
 readonly BASE_DIR=$(pwd)
 readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
 
