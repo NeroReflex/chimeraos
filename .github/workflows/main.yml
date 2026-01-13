@@ -127,6 +127,8 @@ jobs:
      - rootfs
     name: Publish RootFS Image
     uses: ./.github/workflows/publish-rootfs-image.yml
+    with:
+      image_tag: ${{ needs.rootfs.outputs.image_tag }}
 
   build:
     needs:

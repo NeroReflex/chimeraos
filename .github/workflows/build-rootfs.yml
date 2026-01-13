@@ -21,6 +21,7 @@ jobs:
       display_name: ${{ steps.build_rootfs.outputs.display_name }}
       display_version: ${{ steps.build_rootfs.outputs.display_version }}
       rootfs: ${{ steps.build_rootfs.outputs.rootfs }}
+      image_tag: ${{ steps.set_image.outputs.image_tag }}
     steps:
       - name: Set 8.8.8.8 as dns server
         run: |
@@ -64,6 +65,17 @@ jobs:
           docker pull ${{ steps.meta.outputs.tags }}
           docker run -u root --rm --entrypoint=/workdir/generate-rootfs.sh -v $(pwd):/workdir -v $(pwd)/output:/output -v $GITHUB_OUTPUT:$GITHUB_OUTPUT -e "GITHUB_OUTPUT=$GITHUB_OUTPUT" --privileged=true ${{ steps.meta.outputs.tags }} $(echo ${GITHUB_SHA} | cut -c1-7)
           echo -e "$(docker inspect --format='{{index .RepoDigests 0}}' ${{ steps.meta.outputs.tags }})" > output/container.txt
+      - name: Set image tag from manifest
+        id: set_image
+        run: |
+          set -euo pipefail
+          source ./manifest
+          # use SYSTEM_NAME and VERSION from manifest
+          NAME=${SYSTEM_NAME}
+          VERSION=${VERSION}
+          SHA=$(echo ${GITHUB_SHA} | cut -c1-7)
+          IMAGE_TAG="${NAME}_${VERSION}:${SHA}"
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:

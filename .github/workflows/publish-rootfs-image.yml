@@ -1,7 +1,12 @@
 name: Publish RootFS Image
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      image_tag:
+        type: string
+        description: Image name and tag in format "name_version:sha"
+        required: true
 
 permissions:
   contents: read
@@ -30,7 +35,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare Dockerfile and derive image name
+      - name: Prepare Dockerfile and use provided image tag
         id: prepare
         run: |
           set -euo pipefail
@@ -40,49 +45,27 @@ jobs:
           fi
           cp "/tmp/rootfs/$ARTIFACT" .
 
-          # Try to locate /etc/os-release inside the tarball
-          FILE_PATH=$(tar -tf "$ARTIFACT" | grep -E '/etc/os-release$' | head -n1 || true)
-          if [ -n "$FILE_PATH" ]; then
-            OSREL=$(tar -xOf "$ARTIFACT" "$FILE_PATH")
-          else
-            FILE_PATH=$(tar -tf "$ARTIFACT" | grep -E '^etc/os-release$' | head -n1 || true)
-            if [ -n "$FILE_PATH" ]; then
-              OSREL=$(tar -xOf "$ARTIFACT" "$FILE_PATH")
-            else
-              echo "Warning: /etc/os-release not found inside tarball; using generic name" >&2
-              OSREL='PRETTY_NAME="rootfs"\nVERSION_ID="latest"'
-            fi
-          fi
-
-          NAME=$(echo "$OSREL" | sed -n "s/^NAME=\(.*\)/\1/p" | tr -d '"')
-          VERSION_ID=$(echo "$OSREL" | sed -n "s/^VERSION_ID=\(.*\)/\1/p" | tr -d '"')
-          if [ -z "$NAME" ]; then
-            NAME=$(echo "$OSREL" | sed -n "s/^PRETTY_NAME=\(.*\)/\1/p" | tr -d '"')
-          fi
-          if [ -z "$VERSION_ID" ]; then
-            VERSION_ID="latest"
-          fi
-
-          # sanitize for image name
-          SAFE_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]+/-/g' | sed 's/^-\|-$//g')
-          SAFE_VERSION=$(echo "$VERSION_ID" | tr -cs '[:alnum:].' '-')
-
-          IMAGE_BASE="ghcr.io/${{ github.repository_owner }}/${SAFE_NAME}-${SAFE_VERSION}"
+          INPUT_TAG="${{ inputs.image_tag }}"
+          NAME_PART=$(echo "$INPUT_TAG" | cut -d: -f1)
+          TAG_PART=$(echo "$INPUT_TAG" | cut -d: -f2-)
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME="ghcr.io/${OWNER}/${NAME_PART}"
 
           echo "ARTIFACT=$ARTIFACT" >> image.env
-          echo "IMAGE_BASE=$IMAGE_BASE" >> image.env
+          echo "IMAGE_NAME=$IMAGE_NAME" >> image.env
+          echo "IMAGE_TAG=$TAG_PART" >> image.env
 
           echo "FROM scratch" > Dockerfile
           echo "ADD ${ARTIFACT} /" >> Dockerfile
           echo "CMD ["/bin/sh"]" >> Dockerfile
-          echo "EOF" >> Dockerfile
 
       - name: Build and push image to GHCR
         run: |
           set -euo pipefail
           . ./image.env
+          # IMAGE_NAME has no tag, IMAGE_TAG contains the sha
           docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            -t ${IMAGE_BASE}:${{ github.sha }} \
-            -t ${IMAGE_BASE}:latest \
+            --platform linux/amd64 \
+            -t ${IMAGE_NAME}:${IMAGE_TAG} \
+            -t ${IMAGE_NAME}:latest \
             --push .
