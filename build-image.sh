@@ -12,7 +12,7 @@ BUILD_USER=${BUILD_USER:-}
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
 # Install needed software
-sudo pacman -S --noconfirm install \
+sudo pacman -S --noconfirm \
 	btrfs-progs \
 	dosfstools \
 	gzip \
