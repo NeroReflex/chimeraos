@@ -33,6 +33,31 @@ pushd embedded_quickstart
 git checkout scarthgap
 popd
 
+# Patch the cloned genimage.sh to ensure partition device nodes appear in
+# containerized runners where udev may not auto-create "${LOOP}pN" nodes.
+GENIMAGE_PATH="${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh"
+if [ -f "${GENIMAGE_PATH}" ]; then
+	if ! grep -q "udevadm settle" "${GENIMAGE_PATH}" 2>/dev/null; then
+		echo "Patching ${GENIMAGE_PATH} to add udev/partprobe fallbacks"
+		awk '
+		BEGIN{p=0}
+		/readonly LOOPBACK_OUTPUT=\$\(losetup -P -f --show/ && p==0 {
+			print
+			print "    # Ensure kernel/udev creates partition device nodes when running in containers"
+			print "    if command -v udevadm >/dev/null 2>&1; then udevadm settle || true; fi"
+			print "    if [ ! -b \"${LOOPBACK_OUTPUT}p1\" ]; then"
+			print "      if command -v partprobe >/dev/null 2>&1; then partprobe \"${LOOPBACK_OUTPUT}\" || true; fi"
+			print "      if command -v partx >/dev/null 2>&1; then partx -a \"${LOOPBACK_OUTPUT}\" || true; fi"
+			print "      if command -v kpartx >/dev/null 2>&1; then kpartx -a \"${LOOPBACK_OUTPUT}\" || true; fi"
+			print "      if command -v udevadm >/dev/null 2>&1; then udevadm settle || sleep 1; fi"
+			print "    fi"
+			p=1; next
+		}
+		{ print }
+		' "${GENIMAGE_PATH}" > "${GENIMAGE_PATH}.patched" && mv "${GENIMAGE_PATH}.patched" "${GENIMAGE_PATH}"
+	fi
+fi
+
 source manifest
 
 if [ -z "${SYSTEM_NAME}" ]; then
