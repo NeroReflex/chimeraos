@@ -23,7 +23,7 @@ sudo pacman -S --noconfirm \
 	xz \
 	zstd \
 	sbsigntools \
-	losetup
+	util-linux
 
 readonly BASE_DIR=$(pwd)
 readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
