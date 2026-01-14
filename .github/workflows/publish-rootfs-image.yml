@@ -46,9 +46,12 @@ jobs:
           cp "/tmp/rootfs/$ARTIFACT" .
 
           INPUT_TAG="${{ inputs.image_tag }}"
-          NAME_PART=$(echo "$INPUT_TAG" | cut -d: -f1)
-          TAG_PART=$(echo "$INPUT_TAG" | cut -d: -f2-)
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+
+          source ./manifest
+          readonly NAME_PART="${SYSTEM_NAME}_${VERSION}"
+          readonly TAG_PART=$(echo ${GITHUB_SHA:-} | cut -c1-7)
+
           IMAGE_NAME="ghcr.io/${OWNER}/${NAME_PART}"
 
           echo "ARTIFACT=$ARTIFACT" >> image.env
