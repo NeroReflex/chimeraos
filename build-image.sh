@@ -22,7 +22,8 @@ sudo pacman -S --noconfirm \
 	qemu-img \
 	xz \
 	zstd \
-	sbsigntools
+	sbsigntools \
+	losetup
 
 readonly BASE_DIR=$(pwd)
 readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
