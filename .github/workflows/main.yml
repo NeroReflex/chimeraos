@@ -132,7 +132,7 @@ jobs:
 
   build:
     needs:
-     - rootfs
+     - publish-rootfs-image
     name: Build ChimeraOS UNSTABLE image
     uses: ./.github/workflows/build-system-image.yml
     with:
