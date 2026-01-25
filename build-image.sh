@@ -32,49 +32,51 @@ popd
 ## Patch the cloned genimage.sh to ensure partition device nodes appear in
 ## containerized runners where udev may not auto-create "${LOOP}pN" nodes.
 GENIMAGE_PATH="${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh"
-if [ -f "${GENIMAGE_PATH}" ]; then
-	echo "Patching ${GENIMAGE_PATH} to add partition-scan and detection fallback"
-	awk '
-	BEGIN{p=0}
-	/losetup .*--show/ && p==0 {
-		print
-		print "    # --- partition-scan + detection fallback (injected by build-image.sh) ---"
-			print "    # Ask kernel/udev to create partition device nodes; try several helpers"
-			print "    # Debug: show current device nodes and mappings so CI logs capture state"
-			print "    echo 'DEBUG: listing /dev entries after losetup:' >&2"
-			print "    ls -l /dev/loop* /dev/mapper/* 2>/dev/null >&2 || true"
-			print "    echo 'DEBUG: losetup -a output:' >&2"
-			print "    losetup -a 2>/dev/null >&2 || true"
-			print "    echo 'DEBUG: kpartx -l output for the image:' >&2"
-			print "    if command -v kpartx >/dev/null 2>&1; then kpartx -l \"${LOOPBACK_OUTPUT}\" 2>/dev/null >&2 || true; fi"
-			print "    echo 'DEBUG: dmesg tail (last 50 lines):' >&2"
-			print "    dmesg | tail -n 50 >&2 || true"
-		print "    if command -v partprobe >/dev/null 2>&1; then partprobe \"${LOOPBACK_OUTPUT}\" || true; fi"
-		print "    if command -v partx >/dev/null 2>&1; then partx -a \"${LOOPBACK_OUTPUT}\" || true; fi"
-		print "    if command -v kpartx >/dev/null 2>&1; then kpartx -a \"${LOOPBACK_OUTPUT}\" || true; fi"
-		print "    if command -v udevadm >/dev/null 2>&1; then udevadm settle || sleep 1; fi"
-		print ""
-		print "    # Find the correct partition device path; support /dev/loopNpX and /dev/mapper/loopNpX"
-		print "    if [ -b \"${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER:-1}\" ]; then"
-		print "      LOOPBACK_DEV_PART=\"${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER:-1}\""
-		print "    elif [ -b \"/dev/mapper/$(basename \"${LOOPBACK_OUTPUT}\")p${IMAGE_PART_NUMBER:-1}\" ]; then"
-		print "      LOOPBACK_DEV_PART=\"/dev/mapper/$(basename \"${LOOPBACK_OUTPUT}\")p${IMAGE_PART_NUMBER:-1}\""
-		print "    else"
-		print "      # try to discover via kpartx listing"
-		print "      if command -v kpartx >/dev/null 2>&1; then"
-		print "        MAPDEV=$(kpartx -l \"${LOOPBACK_OUTPUT}\" 2>/dev/null | awk '{print \"/dev/mapper/\"$1}' | head -n1 || true)"
-		print "        if [ -n \"$MAPDEV\" ] && [ -b \"$MAPDEV\" ]; then"
-		print "          LOOPBACK_DEV_PART=\"$MAPDEV\""
-		print "        fi"
-		print "      fi"
-		print "    fi"
-		print "    # if still not found, leave the original variable behavior to fail visibly"
-		print "    # --- end injected block ---"
-		p=1; next
-	}
-	{ print }
-	' "${GENIMAGE_PATH}" > "${GENIMAGE_PATH}.patched" && mv "${GENIMAGE_PATH}.patched" "${GENIMAGE_PATH}"
-	fi
+if [ ! -x "${GENIMAGE_PATH}" ]; then
+	echo "Making ${GENIMAGE_PATH} executable"
+	chmod a+x "${GENIMAGE_PATH}"
+#	echo "Patching ${GENIMAGE_PATH} to add partition-scan and detection fallback"
+#	awk '
+#	BEGIN{p=0}
+#	/losetup .*--show/ && p==0 {
+#		print
+#		print "    # --- partition-scan + detection fallback (injected by build-image.sh) ---"
+#			print "    # Ask kernel/udev to create partition device nodes; try several helpers"
+#			print "    # Debug: show current device nodes and mappings so CI logs capture state"
+#			print "    echo 'DEBUG: listing /dev entries after losetup:' >&2"
+#			print "    ls -l /dev/loop* /dev/mapper/* 2>/dev/null >&2 || true"
+#			print "    echo 'DEBUG: losetup -a output:' >&2"
+#			print "    losetup -a 2>/dev/null >&2 || true"
+#			print "    echo 'DEBUG: kpartx -l output for the image:' >&2"
+#			print "    if command -v kpartx >/dev/null 2>&1; then kpartx -l \"${LOOPBACK_OUTPUT}\" 2>/dev/null >&2 || true; fi"
+#			print "    echo 'DEBUG: dmesg tail (last 50 lines):' >&2"
+#			print "    dmesg | tail -n 50 >&2 || true"
+#		print "    if command -v partprobe >/dev/null 2>&1; then partprobe \"${LOOPBACK_OUTPUT}\" || true; fi"
+#		print "    if command -v partx >/dev/null 2>&1; then partx -a \"${LOOPBACK_OUTPUT}\" || true; fi"
+#		print "    if command -v kpartx >/dev/null 2>&1; then kpartx -a \"${LOOPBACK_OUTPUT}\" || true; fi"
+#		print "    if command -v udevadm >/dev/null 2>&1; then udevadm settle || sleep 1; fi"
+#		print ""
+#		print "    # Find the correct partition device path; support /dev/loopNpX and /dev/mapper/loopNpX"
+#		print "    if [ -b \"${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER:-1}\" ]; then"
+#		print "      LOOPBACK_DEV_PART=\"${LOOPBACK_OUTPUT}p${IMAGE_PART_NUMBER:-1}\""
+#		print "    elif [ -b \"/dev/mapper/$(basename \"${LOOPBACK_OUTPUT}\")p${IMAGE_PART_NUMBER:-1}\" ]; then"
+#		print "      LOOPBACK_DEV_PART=\"/dev/mapper/$(basename \"${LOOPBACK_OUTPUT}\")p${IMAGE_PART_NUMBER:-1}\""
+#		print "    else"
+#		print "      # try to discover via kpartx listing"
+#		print "      if command -v kpartx >/dev/null 2>&1; then"
+#		print "        MAPDEV=$(kpartx -l \"${LOOPBACK_OUTPUT}\" 2>/dev/null | awk '{print \"/dev/mapper/\"$1}' | head -n1 || true)"
+#		print "        if [ -n \"$MAPDEV\" ] && [ -b \"$MAPDEV\" ]; then"
+#		print "          LOOPBACK_DEV_PART=\"$MAPDEV\""
+#		print "        fi"
+#		print "      fi"
+#		print "    fi"
+#		print "    # if still not found, leave the original variable behavior to fail visibly"
+#		print "    # --- end injected block ---"
+#		p=1; next
+#	}
+#	{ print }
+#	' "${GENIMAGE_PATH}" > "${GENIMAGE_PATH}.patched" && mv "${GENIMAGE_PATH}.patched" "${GENIMAGE_PATH}"
+#	fi
 fi
 
 source manifest
