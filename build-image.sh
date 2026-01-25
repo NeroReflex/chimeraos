@@ -11,11 +11,13 @@ fi
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
 # Install needed software
+sudo apt-get update
+sudo apt-get upgrade -y
 sudo apt-get install -y \
 	git wget curl coreutils util-linux dos2unix bsdmainutils \
 	btrfs-progs dosfstools mtools parted \
 	lsb-release \
-	gzip xz zstd \
+	gzip zstd xz-utils \
 	libelf-dev efitools libnss3-tools pesign \
 	policycoreutils mount efitools libnss3-tools uuid-runtime syslinux-utils
 

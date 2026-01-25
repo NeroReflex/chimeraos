@@ -130,6 +130,7 @@ jobs:
     with:
       image_tag: ${{ needs.rootfs.outputs.image_tag }}
 
+  # Could run in parallel with publish-rootfs-image, but would error out with no space remaining
   build:
     needs:
      - publish-rootfs-image
