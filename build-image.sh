@@ -79,7 +79,7 @@ if [ ! -x "${GENIMAGE_PATH}" ]; then
 #	fi
 fi
 
-source manifest
+source ./manifest
 
 if [ -z "${SYSTEM_NAME}" ]; then
   echo "SYSTEM_NAME must be specified"
