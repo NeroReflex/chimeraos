@@ -11,12 +11,12 @@ fi
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
 # Install needed software
-sudo apt install -y \
+sudo apt-get install -y \
 	git wget curl coreutils util-linux dos2unix bsdmainutils \
 	btrfs-progs dosfstools mtools parted \
 	lsb-release \
 	gzip xz zstd \
-	sbsigntools libelf-dev efitools libnss3-tools pesign \
+	libelf-dev efitools libnss3-tools pesign \
 	policycoreutils mount efitools libnss3-tools uuid-runtime syslinux-utils
 
 readonly BASE_DIR=$(pwd)
