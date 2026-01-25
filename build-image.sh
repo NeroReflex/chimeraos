@@ -8,22 +8,16 @@ if [ $EUID -ne 0 ]; then
 	exit 1
 fi
 
-BUILD_USER=${BUILD_USER:-}
 OUTPUT_DIR=${OUTPUT_DIR:-}
 
 # Install needed software
-sudo pacman -S --noconfirm \
-	btrfs-progs \
-	dosfstools \
-	gzip \
+sudo apt install -y \
+	git wget curl coreutils util-linux dos2unix bsdmainutils \
+	btrfs-progs dosfstools mtools parted \
 	lsb-release \
-	mtools \
-	parted \
-	qemu-img \
-	xz \
-	zstd \
-	sbsigntools \
-	losetup
+	gzip xz zstd \
+	sbsigntools libelf-dev efitools libnss3-tools pesign \
+	policycoreutils mount efitools libnss3-tools uuid-runtime syslinux-utils
 
 readonly BASE_DIR=$(pwd)
 readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
