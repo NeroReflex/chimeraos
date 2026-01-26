@@ -10,12 +10,18 @@ on:
         type: string
         description: Postfix used in release.
         default: ''
+      version:
+        type: string
+        description: Version to build / tag to create (if provided)
+        default: ''
 
 jobs:
   build-system-image:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      VERSION: ${{ inputs.version }}
     outputs:
       version: ${{ steps.build_image.outputs.version }}
       display_name: ${{ steps.build_image.outputs.display_name }}
@@ -73,9 +79,11 @@ jobs:
       - name: Build system image
         id: build_image
         run: |
+          export VERSION_TAG=${{ steps.meta.outputs.tags }}
           sudo bash build-image.sh
       - name: Create release
         id: create_release
+        if: ${{ steps.build_image.outputs.version != '' || startsWith(github.ref, 'refs/tags/') }}
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

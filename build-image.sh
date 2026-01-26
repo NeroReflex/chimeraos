@@ -73,7 +73,7 @@ fi
 touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 # Build the image properly
-bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
+bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}"
 
 echo "current directory:"
 ls -lah .
@@ -81,28 +81,26 @@ ls -lah .
 echo "Binary dir"
 ls -lah ${IMAGE_DIR}
 
-mv "${IMAGE_DIR}/disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+mv "${IMAGE_DIR}/disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}.img"
 
 # cleanup any leftover rootfs tars
 rm -f ${IMAGE_DIR}/*rootfs*.tar*
 
 # compress the resulting image
-xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}.img"
-IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
+xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}.img"
+IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}.img.xz"
 
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 cat sha256sum.txt
 
-# Debugging info
-ls -lah .
-
 # Move the image to the output directory, if one was specified.
-if [ -n "${OUTPUT_DIR:-}" ]; then
-	mkdir -p "${OUTPUT_DIR}"
-	mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
-	#mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
-	#mv "sha256sum.txt" "${OUTPUT_DIR}/"
-fi
+mkdir -p "${OUTPUT_DIR}"
+mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
+#mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
+#mv "sha256sum.txt" "${OUTPUT_DIR}/"
+
+# Debugging info
+ls -lah "${OUTPUT_DIR}"
 
 # set outputs for github actions
 if [ -f "${GITHUB_OUTPUT:-}" ]; then
