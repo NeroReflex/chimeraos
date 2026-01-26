@@ -75,7 +75,13 @@ touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
 # Build the image properly
 bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
 
-mv "disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+echo "current directory:"
+ls -lah .
+
+echo "Binary dir"
+ls -lah ${IMAGE_DIR}
+
+mv "${IMAGE_DIR}/disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
 
 # cleanup any leftover rootfs tars
 rm -f ${IMAGE_DIR}/*rootfs*.tar*
