@@ -99,7 +99,6 @@ export PACKAGES="\
 	mangohud \
 	modemmanager \
 	nano \
-	nautilus \
 	networkmanager \
 	nfs-utils \
 	noto-fonts-emoji \
