@@ -81,23 +81,18 @@ fi
 
 source ./manifest
 
-if [ -z "${SYSTEM_NAME}" ]; then
+if [ -z "${SYSTEM_NAME:-}" ]; then
   echo "SYSTEM_NAME must be specified"
   exit
 fi
 
-if [ -z "${VERSION}" ]; then
+if [ -z "${VERSION:-}" ]; then
   echo "VERSION must be specified"
   exit
 fi
 
-DISPLAY_VERSION=${VERSION}
-VERSION_NUMBER=${VERSION}
-
-if [ -n "$1" ]; then
-	DISPLAY_VERSION="${VERSION} (${1})"
-	VERSION="${VERSION}_${1}"
-fi
+DISPLAY_VERSION=${VERSION:-}
+VERSION_NUMBER=${VERSION:-}
 
 # If a prebuilt rootfs tar was provided (downloaded into /tmp/rootfs by the workflow),
 # extract it directly into the btrfs subvolume, otherwise error out
