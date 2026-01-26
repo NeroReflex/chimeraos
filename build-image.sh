@@ -100,8 +100,8 @@ ls -lah .
 if [ -n "${OUTPUT_DIR:-}" ]; then
 	mkdir -p "${OUTPUT_DIR}"
 	mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
-	mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
-	mv "sha256sum.txt" "${OUTPUT_DIR}/"
+	#mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
+	#mv "sha256sum.txt" "${OUTPUT_DIR}/"
 fi
 
 # set outputs for github actions
