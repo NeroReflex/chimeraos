@@ -63,6 +63,13 @@ jobs:
         with:
             name: rootfs
             path: /tmp/rootfs
+      - name: Install software dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y qemu-user-static debootstrap rsync lsb-release gzip zstd xz-utils policycoreutils  
+          sudo apt-get install -y git wget curl coreutils util-linux dos2unix bsdmainutils uuid-runtime syslinux-utils
+          sudo apt-get install -y btrfs-progs dosfstools mtools parted libelf-dev efitools libnss3-tools pesign mount efitools libnss3-tools
       - name: Build system image
         id: build_image
         run: |
