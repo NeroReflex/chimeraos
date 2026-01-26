@@ -79,8 +79,7 @@ jobs:
       - name: Build system image
         id: build_image
         run: |
-          export VERSION_TAG=${{ steps.meta.outputs.tags }}
-          sudo bash build-image.sh
+          sudo bash build-image.sh ${{ steps.meta.outputs.tags }}
       - name: Create release
         id: create_release
         if: ${{ steps.build_image.outputs.version != '' || startsWith(github.ref, 'refs/tags/') }}

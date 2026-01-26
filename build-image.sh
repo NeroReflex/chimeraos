@@ -39,6 +39,8 @@ fi
 DISPLAY_VERSION=${VERSION:-}
 VERSION_NUMBER=${VERSION:-}
 
+VERSION_TAG="$1"
+
 # If a prebuilt rootfs tar was provided (downloaded into /tmp/rootfs by the workflow),
 # extract it directly into the btrfs subvolume, otherwise error out
 if [ ! -d /tmp/rootfs ]; then
