@@ -10,10 +10,12 @@ export WEBSITE="https://chimeraos.org"
 export DOCUMENTATION_URL="https://chimeraos.org/about"
 export BUG_REPORT_URL="https://github.com/ChimeraOS/chimeraos/issues"
 
-export KERNEL_PACKAGE="linux"
+export KERNEL_PACKAGE="linux-g14"
 export KERNEL_PACKAGE_ORIGIN="repo"
 
 export PACKAGES="\
+	asusctl \
+	rog-control-center \
 	accountsservice \
 	acsccid \
 	alsa-firmware \
@@ -167,45 +169,29 @@ export PACKAGES="\
 	lib32-vulkan-radeon \
 	vulkan-mesa-implicit-layers \
 	lib32-vulkan-mesa-implicit-layers \
-	cosmic-launcher \
-	cosmic-app-library \
-	cosmic-applets \
-	cosmic-bg \
-	cosmic-comp \
-	cosmic-files \
-	cosmic-greeter \
-	cosmic-icon-theme \
-	cosmic-idle \
-	cosmic-initial-setup \
-	cosmic-launcher \
-	cosmic-notifications \
-	cosmic-osd \
-	cosmic-panel \
-	cosmic-player \
-	cosmic-randr \
-	cosmic-screenshot \
-	cosmic-session \
-	cosmic-settings \
-	cosmic-settings-daemon \
-	cosmic-wallpapers \
-	cosmic-store \
-	cosmic-terminal \
-	cosmic-text-editor \
-	cosmic-workspaces \
-	xdg-desktop-portal-cosmic \
 	zellij \
 	eza \
 	bat \
 	helix \
 	nushell \
 	alacritty \
+	niri \
+	fuzzel \
+	mako \
+	waybar \
+	xdg-desktop-portal-gtk \
+	swaybg \
+	swayidle \
+	swaylock \
+	xwayland-satellite \
+	udiskie \
+	kanshi \
 "
 
 # Each entry is the clone url (https://aur.archlinux.org/{AUR_PACKAGE}.git)
 # Which is often the same as the package name but it can be different.
 # Check on the AUR webpage if you are unsure
 export AUR_PACKAGES="\
-	asusctl-devel-git \
 	ayaneo-platform-dkms-git \
 	ayn-platform-dkms-git \
 	bcm20702a1-firmware \
@@ -268,6 +254,17 @@ export USER_SERVICES="\
 	chimera-cart-monitor.service \
 	chimera-nfc-monitor.service \
 "
+
+linux_g14_hook() {
+	pacman-key --recv-keys 8F654886F17D497FEFE3DB448B15A6B0E9A3FA35
+	pacman-key --finger 8F654886F17D497FEFE3DB448B15A6B0E9A3FA35
+	pacman-key --lsign-key 8F654886F17D497FEFE3DB448B15A6B0E9A3FA35
+	pacman-key --finger 8F654886F17D497FEFE3DB448B15A6B0E9A3FA35
+
+	echo "" >> /etc/pacman.conf
+	echo "[g14]" >> /etc/pacman.conf
+	echo "Server = https://arch.asus-linux.org" >> /etc/pacman.conf
+}
 
 postinstallhook() {
 	# Add sudo permissions

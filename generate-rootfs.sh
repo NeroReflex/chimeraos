@@ -92,6 +92,8 @@ sed -i '/ParallelDownloads/s/^/#/g' /etc/pacman.conf
 # Cannot check space in chroot
 sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 
+linux_g14_hook
+
 # update package databases
 pacman --noconfirm -Syy
 
