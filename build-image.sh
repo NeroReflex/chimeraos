@@ -40,6 +40,7 @@ DISPLAY_VERSION=${VERSION:-}
 VERSION_NUMBER=${VERSION:-}
 
 VERSION_TAG="$1"
+echo "Version tag: ${VERSION_TAG}"
 
 # If a prebuilt rootfs tar was provided (downloaded into /tmp/rootfs by the workflow),
 # extract it directly into the btrfs subvolume, otherwise error out
@@ -75,7 +76,7 @@ fi
 touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 # Build the image properly
-bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}"
+bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
 
 echo "current directory:"
 ls -lah .
@@ -83,14 +84,14 @@ ls -lah .
 echo "Binary dir"
 ls -lah ${IMAGE_DIR}
 
-mv "${IMAGE_DIR}/disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}.img"
+mv "${IMAGE_DIR}/disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
 
 # cleanup any leftover rootfs tars
 rm -f ${IMAGE_DIR}/*rootfs*.tar*
 
 # compress the resulting image
-xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}.img"
-IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}_${VERSION_TAG}.img.xz"
+xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
 
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 cat sha256sum.txt
