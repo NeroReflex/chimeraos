@@ -85,7 +85,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ steps.build_image.outputs.version }}
+          # Use the built version when available, otherwise fall back to the ref name (e.g. tag push)
+          tag_name: ${{ steps.build_image.outputs.version != '' && steps.build_image.outputs.version || github.ref_name }}
           target_commitish: ${{ github.sha }}
           name: ${{ steps.build_image.outputs.display_name }} ${{ steps.build_image.outputs.display_version }} ${{ inputs.postfix }}
           draft: false
