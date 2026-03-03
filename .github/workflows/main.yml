@@ -132,7 +132,8 @@ jobs:
 
   # Could run in parallel with publish-rootfs-image, but would error out with no space remaining
   build:
-#    needs:
+    needs:
+      - rootfs
 #     - publish-rootfs-image
     name: Build ChimeraOS UNSTABLE image
     uses: ./.github/workflows/build-system-image.yml
