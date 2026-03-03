@@ -99,8 +99,19 @@ cat sha256sum.txt
 # Move the image to the output directory, if one was specified.
 mkdir -p "${OUTPUT_DIR}"
 mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
-#mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
-#mv "sha256sum.txt" "${OUTPUT_DIR}/"
+# Move additional artifacts into the output directory so workflows can find them
+if [ -f "${IMAGE_DIR}/build_info.txt" ]; then
+	mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
+fi
+if [ -f "build_info.txt" ]; then
+	mv "build_info.txt" "${OUTPUT_DIR}/"
+fi
+if [ -f "sha256sum.txt" ]; then
+	mv "sha256sum.txt" "${OUTPUT_DIR}/"
+fi
+if [ -f "container.txt" ]; then
+	mv "container.txt" "${OUTPUT_DIR}/"
+fi
 
 # Debugging info
 ls -lah "${OUTPUT_DIR}"

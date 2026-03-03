@@ -78,8 +78,10 @@ jobs:
           sudo apt-get install -y btrfs-progs dosfstools mtools parted libelf-dev efitools libnss3-tools pesign mount efitools libnss3-tools
       - name: Build system image
         id: build_image
+        env:
+          OUTPUT_DIR: ${{ github.workspace }}/output
         run: |
-          sudo bash build-image.sh ${{ steps.meta.outputs.tags }}
+          sudo env GITHUB_OUTPUT="${GITHUB_OUTPUT:-}" OUTPUT_DIR="${OUTPUT_DIR}" bash build-image.sh ${{ steps.meta.outputs.tags }}
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v2
