@@ -73,14 +73,14 @@ fi
 #fi
 
 # BTRFS rootfs subvolume
-readonly SUBVOLUME_FILE=$(find -name '*.btrfs.xz' 2>/dev/null | head -n1)
+readonly SUBVOLUME_FILE=$(find "${OUTPUT_DIR}" -name '*.btrfs.xz' 2>/dev/null | head -n1)
 if [ ! -f "${SUBVOLUME_FILE}" ]; then
 	echo "No BTRFS subvolume file found in ${IMAGE_DIR}"
 	exit 1
 fi
 
 # Update package filename
-readonly UPDATE_FILE=$(find -name 'update_package.tar' 2>/dev/null | head -n1)
+readonly UPDATE_FILE=$(find "${OUTPUT_DIR}" -name 'update_package.tar' 2>/dev/null | head -n1)
 if [ ! -f "${UPDATE_FILE}" ]; then
 	echo "No update file found in ${IMAGE_DIR}"
 	exit 1
