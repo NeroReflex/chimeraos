@@ -72,6 +72,18 @@ fi
 #	exit
 #fi
 
+# placeholder to kick off the x86_64 detection of the script
+touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
+
+# Build the image properly
+bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
+
+echo "current directory:"
+ls -lah .
+
+# Remove the empty sentinel file used for x86_64 detection
+rm -f "${IMAGE_DIR}/grub-efi-bootx64.efi"
+
 # BTRFS rootfs subvolume
 readonly SUBVOLUME_FILE=$(find "${OUTPUT_DIR}" -name '*.btrfs.xz' 2>/dev/null | head -n1)
 if [ ! -f "${SUBVOLUME_FILE}" ]; then
@@ -85,18 +97,6 @@ if [ ! -f "${UPDATE_FILE}" ]; then
 	echo "No update file found in ${IMAGE_DIR}"
 	exit 1
 fi
-
-# placeholder to kick off the x86_64 detection of the script
-touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
-
-# Build the image properly
-bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
-
-echo "current directory:"
-ls -lah .
-
-# Remove the empty sentinel file used for x86_64 detection
-rm -f "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 echo "Binary dir"
 ls -lah ${IMAGE_DIR}
