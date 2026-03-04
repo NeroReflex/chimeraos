@@ -96,6 +96,4 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             output/${{ steps.build_image.outputs.image_filename }}
-            output/build_info.txt
-            output/sha256sum.txt
-            output/container.txt
+            output/*.txt
