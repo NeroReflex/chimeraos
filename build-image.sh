@@ -96,22 +96,28 @@ IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 cat sha256sum.txt
 
-# Move the image to the output directory, if one was specified.
-mkdir -p "${OUTPUT_DIR}"
-mv "${IMG_FILENAME}" "${OUTPUT_DIR}/"
-# Move additional artifacts into the output directory so workflows can find them
-if [ -f "${IMAGE_DIR}/build_info.txt" ]; then
-	mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}/"
-fi
-if [ -f "build_info.txt" ]; then
-	mv "build_info.txt" "${OUTPUT_DIR}/"
-fi
-if [ -f "sha256sum.txt" ]; then
-	mv "sha256sum.txt" "${OUTPUT_DIR}/"
-fi
-if [ -f "container.txt" ]; then
-	mv "container.txt" "${OUTPUT_DIR}/"
-fi
+# Move the image and other artifacts to the output directory, if one was specified.
+safe_mv() {
+	src="$1"
+	dest_dir="$2"
+	[ -f "$src" ] || return 0
+	dest="$dest_dir/$(basename "$src")"
+	src_abs="$(cd "$(dirname "$src")" && pwd)/$(basename "$src")"
+	dest_dir_abs="$(cd "${dest_dir}" 2>/dev/null && pwd || echo "${dest_dir}")"
+	dest_abs="${dest_dir_abs}/$(basename "$src")"
+	if [ "$src_abs" = "$dest_abs" ]; then
+		echo "Skipping move; source and destination are identical: $src_abs"
+		return 0
+	fi
+	mkdir -p "$dest_dir"
+	mv "$src" "$dest"
+}
+
+safe_mv "${IMG_FILENAME}" "${OUTPUT_DIR}"
+safe_mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}"
+safe_mv "build_info.txt" "${OUTPUT_DIR}"
+safe_mv "sha256sum.txt" "${OUTPUT_DIR}"
+safe_mv "container.txt" "${OUTPUT_DIR}"
 
 # Debugging info
 ls -lah "${OUTPUT_DIR}"
