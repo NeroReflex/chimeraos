@@ -143,12 +143,15 @@ ls -lah "${OUTPUT_DIR}"
 
 # set outputs for github actions
 if [ -f "${GITHUB_OUTPUT:-}" ]; then
+	readonly UPDATE_FILENAME=$(basename "${UPDATE_FILE}")
+	readonly DISK_FILENAME=$(basename "${IMG_FILENAME}")
+	readonly SUBVOL_FILENAME=$(basename "${SUBVOLUME_FILE}")
 	echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
 	echo "display_version=${DISPLAY_VERSION}" >> "${GITHUB_OUTPUT}"
 	echo "display_name=${SYSTEM_DESC}" >> "${GITHUB_OUTPUT}"
-	echo "disk_image_filename=${IMG_FILENAME}" >> "${GITHUB_OUTPUT}"
-	echo "update_image_filename=${SUBVOLUME_FILE}" >> "${GITHUB_OUTPUT}"
-	echo "update_filename=${UPDATE_FILE}" >> "${GITHUB_OUTPUT}"
+	echo "disk_image_filename=${DISK_FILENAME}" >> "${GITHUB_OUTPUT}"
+	echo "update_image_filename=${SUBVOL_FILENAME}" >> "${GITHUB_OUTPUT}"
+	echo "update_filename=${UPDATE_FILENAME}" >> "${GITHUB_OUTPUT}"
 else
 	echo "No github output file set"
 fi
