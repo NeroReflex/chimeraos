@@ -66,10 +66,24 @@ else
 	OUTPUT_DIR="/output"
 fi
 
-TARFILE=$(ls "${IMAGE_DIR}" 2>/dev/null | head -n1 || true)
-if [ ! -n "$TARFILE" ]; then
-	echo "No rootfs archive found in /tmp/rootfs"
-	exit
+#TARFILE=$(ls "${IMAGE_DIR}" 2>/dev/null | head -n1 || true)
+#if [ ! -n "$TARFILE" ]; then
+#	echo "No rootfs archive found in /tmp/rootfs"
+#	exit
+#fi
+
+# BTRFS rootfs subvolume
+readonly SUBVOLUME_FILE=$(find -name '*.btrfs.xz' 2>/dev/null | head -n1)
+if [ ! -f "${SUBVOLUME_FILE}" ]; then
+	echo "No BTRFS subvolume file found in ${IMAGE_DIR}"
+	exit 1
+fi
+
+# Update package filename
+readonly UPDATE_FILE=$(find -name 'update_package.tar' 2>/dev/null | head -n1)
+if [ ! -f "${UPDATE_FILE}" ]; then
+	echo "No update file found in ${IMAGE_DIR}"
+	exit 1
 fi
 
 # placeholder to kick off the x86_64 detection of the script
@@ -80,6 +94,9 @@ bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SY
 
 echo "current directory:"
 ls -lah .
+
+# Remove the empty sentinel file used for x86_64 detection
+rm -f "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 echo "Binary dir"
 ls -lah ${IMAGE_DIR}
@@ -113,6 +130,8 @@ safe_mv() {
 	mv "$src" "$dest"
 }
 
+safe_mv "${UPDATE_FILE}" "${OUTPUT_DIR}"
+safe_mv "${SUBVOLUME_FILE}" "${OUTPUT_DIR}"
 safe_mv "${IMG_FILENAME}" "${OUTPUT_DIR}"
 safe_mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}"
 safe_mv "build_info.txt" "${OUTPUT_DIR}"
@@ -127,7 +146,9 @@ if [ -f "${GITHUB_OUTPUT:-}" ]; then
 	echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
 	echo "display_version=${DISPLAY_VERSION}" >> "${GITHUB_OUTPUT}"
 	echo "display_name=${SYSTEM_DESC}" >> "${GITHUB_OUTPUT}"
-	echo "image_filename=${IMG_FILENAME}" >> "${GITHUB_OUTPUT}"
+	echo "disk_image_filename=${IMG_FILENAME}" >> "${GITHUB_OUTPUT}"
+	echo "update_image_filename=${SUBVOLUME_FILE}" >> "${GITHUB_OUTPUT}"
+	echo "update_filename=${UPDATE_FILE}" >> "${GITHUB_OUTPUT}"
 else
 	echo "No github output file set"
 fi

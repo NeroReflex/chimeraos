@@ -26,7 +26,9 @@ jobs:
       version: ${{ steps.build_image.outputs.version }}
       display_name: ${{ steps.build_image.outputs.display_name }}
       display_version: ${{ steps.build_image.outputs.display_version }}
-      image_filename: ${{ steps.build_image.outputs.image_filename }}
+      disk_image_filename: ${{ steps.build_image.outputs.disk_image_filename }}
+      update_image_filename: ${{ steps.build_image.outputs.update_image_filename }}
+      update_filename: ${{ steps.build_image.outputs.update_filename }}
     steps:
       - name: Set 8.8.8.8 as dns server
         run: |
@@ -95,5 +97,5 @@ jobs:
           prerelease: true
           fail_on_unmatched_files: true
           files: |
-            output/${{ steps.build_image.outputs.image_filename }}
+            output/${{ steps.build_image.outputs.update_filename }}
             output/*.txt
