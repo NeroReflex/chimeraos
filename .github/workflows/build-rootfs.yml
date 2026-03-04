@@ -87,4 +87,5 @@ jobs:
             path: |
               output/${{ steps.build_rootfs.outputs.rootfs }}
               output/build_info.txt
+              output/container.txt
 
