@@ -14,6 +14,10 @@ on:
         type: string
         description: Version to build / tag to create (if provided)
         default: ''
+      image_tag:
+        type: string
+        description: Image tag produced by the build step to publish
+        default: ''
 
 jobs:
   build-system-image:
