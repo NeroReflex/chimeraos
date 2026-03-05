@@ -49,7 +49,7 @@ jobs:
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
           source ./manifest
-          readonly NAME_PART="${SYSTEM_NAME}_${VERSION}"
+          readonly NAME_PART="${SYSTEM_NAME}"
           readonly TAG_PART=$(echo ${GITHUB_SHA:-} | cut -c1-7)
 
           IMAGE_NAME="ghcr.io/${OWNER}/${NAME_PART}"
