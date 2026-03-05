@@ -1,0 +1,99 @@
+name: Build ChimeraOS image
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/builder
+
+on:
+  workflow_call:
+    inputs:
+      postfix:
+        type: string
+        description: Postfix used in release.
+        default: ''
+      version:
+        type: string
+        description: Version to build / tag to create (if provided)
+        default: ''
+
+jobs:
+  build-system-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+    outputs:
+      version: ${{ steps.build_image.outputs.version }}
+      display_name: ${{ steps.build_image.outputs.display_name }}
+      display_version: ${{ steps.build_image.outputs.display_version }}
+      disk_image_filename: ${{ steps.build_image.outputs.disk_image_filename }}
+      update_image_filename: ${{ steps.build_image.outputs.update_image_filename }}
+      update_filename: ${{ steps.build_image.outputs.update_filename }}
+    steps:
+      - name: Set 8.8.8.8 as dns server
+        run: |
+          sudo sed -i 's/#DNS=/DNS=8.8.8.8 8.8.4.4/g' /etc/systemd/resolved.conf
+          sudo systemctl daemon-reload
+          sudo systemctl restart systemd-networkd
+          sudo systemctl restart systemd-resolved
+      - run: |
+          sudo prlimit --pid $$ --nofile=500000:500000
+          ulimit -a
+      - name: Maximize build space
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/share/java
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf /opt/az
+          df -h
+      - uses: actions/checkout@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - uses: actions/download-artifact@v4
+        name: Download release artifact
+        continue-on-error: true
+        with:
+          name: release-packages
+          path: /tmp/artifacts
+      - name: Prepare environment and install dependencies
+        run: |
+          ls -lah /tmp/artifacts || true
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y git wget curl coreutils util-linux dos2unix
+
+      - name: Build image metadata
+        id: build_image
+        run: |
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "display_name=ChimeraOS" >> $GITHUB_OUTPUT
+          echo "display_version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "disk_image_filename=chimeraos-${VERSION}.img" >> $GITHUB_OUTPUT
+          echo "update_image_filename=chimeraos-${VERSION}-update.img" >> $GITHUB_OUTPUT
+          echo "update_filename=chimeraos-${VERSION}.update" >> $GITHUB_OUTPUT
+
+      - name: Determine rootfs artifact
+        id: build_rootfs
+        run: |
+          ROOTFS_FILE=$(ls /tmp/artifacts 2>/dev/null | grep -i rootfs | head -n1 || true)
+          if [ -n "$ROOTFS_FILE" ]; then
+            echo "rootfs=$ROOTFS_FILE" >> $GITHUB_OUTPUT
+          else
+            echo "rootfs=unknown-rootfs.tar.gz" >> $GITHUB_OUTPUT
+          fi
+      - name: Upload Package Archives
+        uses: actions/upload-artifact@v4
+        with:
+            name: rootfs
+            compression-level: 0
+            path: |
+              /tmp/artifacts/${{ steps.build_rootfs.outputs.rootfs }}
+              /tmp/artifacts/build_info.txt
+              /tmp/artifacts/container.txt

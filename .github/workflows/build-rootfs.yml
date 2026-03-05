@@ -82,10 +82,8 @@ jobs:
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:
-            name: rootfs
+            name: release-packages
             compression-level: 0
             path: |
-              output/${{ steps.build_rootfs.outputs.rootfs }}
-              output/build_info.txt
-              output/container.txt
-
+              output/${{ steps.build_image.outputs.update_filename }}
+              output/*.txt
