@@ -49,10 +49,9 @@ jobs:
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
           source ./manifest
-          readonly NAME_PART="${SYSTEM_NAME}"
           readonly TAG_PART=$(echo ${GITHUB_SHA:-} | cut -c1-7)
 
-          IMAGE_NAME="ghcr.io/${OWNER}/${NAME_PART}"
+          IMAGE_NAME="ghcr.io/${{ github.repository }}"
 
           echo "ARTIFACT=$ARTIFACT" >> image.env
           echo "IMAGE_NAME=$IMAGE_NAME" >> image.env
