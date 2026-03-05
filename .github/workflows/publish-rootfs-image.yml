@@ -51,7 +51,7 @@ jobs:
           source ./manifest
           readonly TAG_PART=$(echo ${GITHUB_SHA:-} | cut -c1-7)
 
-          IMAGE_NAME="ghcr.io/${{ github.repository }}"
+          readonly IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
 
           echo "ARTIFACT=$ARTIFACT" >> image.env
           echo "IMAGE_NAME=$IMAGE_NAME" >> image.env
@@ -65,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           . ./image.env
-          # IMAGE_NAME has no tag, IMAGE_TAG contains the sha
+          # IMAGE_NAME is the repo name with owner (lowercase), IMAGE_TAG contains the sha of the commit
           docker buildx build \
             --platform linux/amd64 \
             -t ${IMAGE_NAME}:${IMAGE_TAG} \
