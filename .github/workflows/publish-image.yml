@@ -72,7 +72,6 @@ jobs:
           sudo apt-get update
           sudo apt-get upgrade -y
           sudo apt-get install -y git wget curl coreutils util-linux dos2unix
-
       - name: Build image metadata
         id: build_image
         run: |
@@ -82,7 +81,6 @@ jobs:
           echo "disk_image_filename=chimeraos-${VERSION}.img" >> $GITHUB_OUTPUT
           echo "update_image_filename=chimeraos-${VERSION}-update.img" >> $GITHUB_OUTPUT
           echo "update_filename=chimeraos-${VERSION}.update" >> $GITHUB_OUTPUT
-
       - name: Determine rootfs artifact
         id: build_rootfs
         run: |
@@ -92,12 +90,18 @@ jobs:
           else
             echo "rootfs=unknown-rootfs.tar.gz" >> $GITHUB_OUTPUT
           fi
-      - name: Upload Package Archives
-        uses: actions/upload-artifact@v4
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
         with:
-            name: rootfs
-            compression-level: 0
-            path: |
-              /tmp/artifacts/${{ steps.build_rootfs.outputs.rootfs }}
-              /tmp/artifacts/build_info.txt
-              /tmp/artifacts/container.txt
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.build_image.outputs.display_name }} ${{ env.RELEASE_VERSION }} ${{ inputs.postfix }}
+          draft: false
+          prerelease: true
+          fail_on_unmatched_files: true
+          files: |
+            /tmp/artifacts/${{ steps.build_image.outputs.update_filename }}
+            /tmp/artifacts/*.txt

@@ -89,45 +89,12 @@ jobs:
           OUTPUT_DIR: ${{ github.workspace }}/output
         run: |
           sudo env GITHUB_OUTPUT="${GITHUB_OUTPUT:-}" OUTPUT_DIR="${OUTPUT_DIR}" bash build-image.sh ${{ steps.meta.outputs.tags }}
-      - name: Set image tag output
-        id: set_image_tag
-        run: |
-          IMAGE_TAG="${{ steps.build_image.outputs.image_tag }}"
-          if [ -z "$IMAGE_TAG" ]; then
-            IMAGE_TAG="${{ steps.meta.outputs.tags }}"
-          fi
-          if [ -z "$IMAGE_TAG" ]; then
-            IMAGE_TAG="${GITHUB_SHA::8}"
-          fi
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
-      - name: Resolve release tag
-        id: resolve_tag
-        env:
-          INPUT_TAG: ${{ inputs.tag }}
-          PARENT_REF_NAME: ${{ github.ref_name }}
-        run: |
-          # Prefer explicit input tag, then parent ref_name, then parse GITHUB_REF for tag
-          if [ -n "${INPUT_TAG:-}" ]; then
-            echo "tag=${INPUT_TAG}" >> $GITHUB_OUTPUT
-          elif [ -n "${PARENT_REF_NAME:-}" ]; then
-            echo "tag=${PARENT_REF_NAME}" >> $GITHUB_OUTPUT
-          elif [ -n "${GITHUB_REF:-}" ] && [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
-          fi
-      - name: Create release
-        id: create_release
-        uses: softprops/action-gh-release@v2
+      - name: Upload Package Archives
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # Use resolved tag (inputs.tag > parent ref name > parsed GITHUB_REF > short sha)
-          tag_name: ${{ steps.resolve_tag.outputs.tag }}
-          target_commitish: ${{ github.sha }}
-          name: ${{ steps.build_image.outputs.display_name }} ${{ steps.build_image.outputs.display_version }} ${{ inputs.postfix }}
-          draft: false
-          prerelease: true
-          fail_on_unmatched_files: true
-          files: |
-            output/${{ steps.build_image.outputs.update_filename }}
-            output/*.txt
+            name: rootfs
+            compression-level: 0
+            path: |
+              output/${{ steps.build_rootfs.outputs.rootfs }}
+              output/build_info.txt
+              output/container.txt
