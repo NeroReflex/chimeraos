@@ -32,7 +32,6 @@ jobs:
       display_version: ${{ steps.build_image.outputs.display_version }}
       disk_image_filename: ${{ steps.build_image.outputs.disk_image_filename }}
       update_image_filename: ${{ steps.build_image.outputs.update_image_filename }}
-      update_filename: ${{ steps.build_image.outputs.update_filename }}
       image_tag: ${{ steps.set_image_tag.outputs.image_tag }}
     steps:
       - name: Set 8.8.8.8 as dns server
