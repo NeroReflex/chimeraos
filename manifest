@@ -225,6 +225,7 @@ export AUR_PACKAGES="\
 	steam_notif_daemon \
 	steam-powerbuttond-git \
 	steam-removable-media-git \
+	wyvern \
 	xpadneo-dkms-git \
 	zenergy-dkms-git \
 "
