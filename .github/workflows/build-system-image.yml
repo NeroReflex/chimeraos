@@ -88,7 +88,11 @@ jobs:
         env:
           OUTPUT_DIR: ${{ github.workspace }}/output
         run: |
-          sudo env GITHUB_OUTPUT="${GITHUB_OUTPUT:-}" OUTPUT_DIR="${OUTPUT_DIR}" bash build-image.sh ${{ steps.meta.outputs.tags }}
+          set -euo pipefail
+          # metadata-action may output multiple tags (newline-separated). Use the first tag.
+          TAGS="${{ steps.meta.outputs.tags }}"
+          FIRST_TAG="$(printf '%s\n' "$TAGS" | head -n1)"
+          sudo env GITHUB_OUTPUT="${GITHUB_OUTPUT:-}" OUTPUT_DIR="${OUTPUT_DIR}" bash build-image.sh "$FIRST_TAG"
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:
