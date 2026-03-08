@@ -111,6 +111,8 @@ xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}.img"
 IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
 
 sha256sum "$IMG_FILENAME" > sha256sum.txt
+sha256sum "$UPDATE_FILE" >> sha256sum.txt
+sha256sum "$SUBVOLUME_FILE" >> sha256sum.txt
 cat sha256sum.txt
 
 # Move the image and other artifacts to the output directory, if one was specified.
