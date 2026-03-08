@@ -3,6 +3,23 @@
 set -euo pipefail
 set -x
 
+# Move the image and other artifacts to the output directory, if one was specified.
+safe_mv() {
+	src="$1"
+	dest_dir="$2"
+	[ -f "$src" ] || return 0
+	dest="$dest_dir/$(basename "$src")"
+	src_abs="$(cd "$(dirname "$src")" && pwd)/$(basename "$src")"
+	dest_dir_abs="$(cd "${dest_dir}" 2>/dev/null && pwd || echo "${dest_dir}")"
+	dest_abs="${dest_dir_abs}/$(basename "$src")"
+	if [ "$src_abs" = "$dest_abs" ]; then
+		echo "Skipping move; source and destination are identical: $src_abs"
+		return 0
+	fi
+	mkdir -p "$dest_dir"
+	mv "$src" "$dest"
+}
+
 if [ $EUID -ne 0 ]; then
 	echo "$(basename $0) must be run as root"
 	exit 1
@@ -27,6 +44,9 @@ DISPLAY_VERSION=${VERSION:-}
 VERSION_NUMBER=${VERSION:-}
 
 VERSION_TAG="$1"
+echo "System name: ${SYSTEM_NAME}"
+echo "Version: ${VERSION}"
+echo "Display version: ${DISPLAY_VERSION}"
 echo "Version tag: ${VERSION_TAG}"
 
 # If a prebuilt rootfs tar was provided (downloaded into /tmp/rootfs by the workflow),
@@ -53,23 +73,17 @@ else
 	OUTPUT_DIR="/output"
 fi
 
-#TARFILE=$(ls "${IMAGE_DIR}" 2>/dev/null | head -n1 || true)
-#if [ ! -n "$TARFILE" ]; then
-#	echo "No rootfs archive found in /tmp/rootfs"
-#	exit
-#fi
+readonly UNCOMPRESSED_IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img"
+readonly UNCOMPRESSED_IMG_PATH="${IMAGE_DIR}/${UNCOMPRESSED_IMG_FILENAME}"
 
-# placeholder to kick off the x86_64 detection of the script
-touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
+# this is used in embuer-script.sh to find the rootfs tarball
+export BINARIES_DIR="${IMAGE_DIR}"
 
-# Build the image properly
-bash "./embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
+# The deployment subvolume is made read-only by the embuer-installer executable when we are finished
+./target/debug/embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh"
 
 echo "current directory:"
 ls -lah .
-
-# Remove the empty sentinel file used for x86_64 detection
-rm -f "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 # BTRFS rootfs subvolume
 readonly SUBVOLUME_FILE=$(find "${OUTPUT_DIR}" -name '*.btrfs.xz' 2>/dev/null | head -n1)
@@ -88,35 +102,18 @@ fi
 echo "Binary dir"
 ls -lah ${IMAGE_DIR}
 
-mv "${IMAGE_DIR}/disk_image.img" "disk_image_${SYSTEM_NAME}-${VERSION}.img"
+safe_mv "${UNCOMPRESSED_IMG_PATH}" "${UNCOMPRESSED_IMG_FILENAME}"
 
 # cleanup any leftover rootfs tars
 rm -f ${IMAGE_DIR}/*rootfs*.tar*
 
 # compress the resulting image
-xz -9e --threads=0 "disk_image_${SYSTEM_NAME}-${VERSION}.img"
-IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
+xz -9e --threads=0 "${UNCOMPRESSED_IMG_FILENAME}"
+readonly IMG_FILENAME="${UNCOMPRESSED_IMG_FILENAME}.xz"
 
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 sha256sum "$UPDATE_FILE" >> sha256sum.txt
 sha256sum "$SUBVOLUME_FILE" >> sha256sum.txt
-
-# Move the image and other artifacts to the output directory, if one was specified.
-safe_mv() {
-	src="$1"
-	dest_dir="$2"
-	[ -f "$src" ] || return 0
-	dest="$dest_dir/$(basename "$src")"
-	src_abs="$(cd "$(dirname "$src")" && pwd)/$(basename "$src")"
-	dest_dir_abs="$(cd "${dest_dir}" 2>/dev/null && pwd || echo "${dest_dir}")"
-	dest_abs="${dest_dir_abs}/$(basename "$src")"
-	if [ "$src_abs" = "$dest_abs" ]; then
-		echo "Skipping move; source and destination are identical: $src_abs"
-		return 0
-	fi
-	mkdir -p "$dest_dir"
-	mv "$src" "$dest"
-}
 
 safe_mv "${UPDATE_FILE}" "${OUTPUT_DIR}"
 safe_mv "${SUBVOLUME_FILE}" "${OUTPUT_DIR}"
