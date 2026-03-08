@@ -203,6 +203,9 @@ postinstallhook
 # record installed packages & versions
 pacman -Q > /manifest
 
+pacman -Scc --noconfirm
+rm -rf /var/cache/pacman/pkg/*
+
 # preserve installed package database
 mkdir -p /usr/var/lib/
 mv /var/lib/pacman /usr/var/lib/
