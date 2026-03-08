@@ -87,7 +87,6 @@ jobs:
           wget https://github.com/NeroReflex/embuer/releases/download/0.2.19/embuer_0.2.19-1_amd64.trixie.deb
           sudo dpkg -i embuer_0.2.19-1_amd64.trixie.deb
           sudo apt-get --fix-broken install -y
-          rm embuer_0.2.19-1_amd6.trixie.deb
       - name: Clone embedded_quickstart
         run: |
           git clone https://github.com/NeroReflex/embedded_quickstart.git
