@@ -86,9 +86,6 @@ pacman-key --populate
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 locale-gen
 
-# Disable parallel downloads
-sed -i '/ParallelDownloads/s/^/#/g' /etc/pacman.conf
-
 # Cannot check space in chroot
 sed -i '/CheckSpace/s/^/#/g' /etc/pacman.conf
 
