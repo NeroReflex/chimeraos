@@ -8,21 +8,8 @@ if [ $EUID -ne 0 ]; then
 	exit 1
 fi
 
-readonly BASE_DIR=$(pwd)
-readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
-
-git clone https://github.com/NeroReflex/embedded_quickstart.git
-pushd embedded_quickstart
-git checkout scarthgap
-popd
-
-## Patch the cloned genimage.sh to ensure partition device nodes appear in
-## containerized runners where udev may not auto-create "${LOOP}pN" nodes.
-GENIMAGE_PATH=$(realpath "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh")
-if [ ! -x "${GENIMAGE_PATH}" ]; then
-	echo "Making ${GENIMAGE_PATH} executable"
-	chmod a+x "${GENIMAGE_PATH}"
-fi
+#readonly BASE_DIR=$(pwd)
+#readonly REALPATH_BASE_DIR=$(realpath "${BASE_DIR}")
 
 source ./manifest
 
@@ -76,7 +63,7 @@ fi
 touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 # Build the image properly
-bash "$GENIMAGE_PATH" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
+bash "./embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
 
 echo "current directory:"
 ls -lah .
@@ -113,7 +100,6 @@ IMG_FILENAME="disk_image_${SYSTEM_NAME}-${VERSION}.img.xz"
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 sha256sum "$UPDATE_FILE" >> sha256sum.txt
 sha256sum "$SUBVOLUME_FILE" >> sha256sum.txt
-cat sha256sum.txt
 
 # Move the image and other artifacts to the output directory, if one was specified.
 safe_mv() {
