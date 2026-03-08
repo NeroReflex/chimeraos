@@ -85,8 +85,8 @@ jobs:
       - name: Install embuer
         run: |
           wget https://github.com/NeroReflex/embuer/releases/download/0.2.19/embuer_0.2.19-1_amd64.trixie.deb
-          dpkg -i embuer_0.2.19-1_amd64.trixie.deb
-          apt-get --fix-broken install -y
+          sudo dpkg -i embuer_0.2.19-1_amd64.trixie.deb
+          sudo apt-get --fix-broken install -y
           rm embuer_0.2.19-1_amd64.deb
       - name: Clone embedded_quickstart
         run: |
