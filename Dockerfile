@@ -38,7 +38,9 @@ RUN echo -e "keyserver-options auto-key-retrieve" >> /etc/pacman.d/gnupg/gpg.con
   su - build -c "git clone https://aur.archlinux.org/paru.git /tmp/paru" && \
   su - build -c "cd /tmp/paru && makepkg -f" && \
   pacman --noconfirm -U /tmp/paru/*.pkg.tar.zst && \
-  paru -S --noconfirm embuer
+  su - build -c "git clone https://aur.archlinux.org/embuer.git /tmp/embuer" && \
+  su - build -c "cd /tmp/embuer && makepkg -f" && \
+  pacman --noconfirm -U /tmp/embuer/*.pkg.tar.zst
 
 # Auto add PGP keys for users
 RUN mkdir -p /etc/gnupg/ && echo -e "keyserver-options auto-key-retrieve" >> /etc/gnupg/gpg.conf
