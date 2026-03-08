@@ -18,7 +18,7 @@ popd
 
 ## Patch the cloned genimage.sh to ensure partition device nodes appear in
 ## containerized runners where udev may not auto-create "${LOOP}pN" nodes.
-GENIMAGE_PATH="${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh"
+GENIMAGE_PATH=$(realpath "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh")
 if [ ! -x "${GENIMAGE_PATH}" ]; then
 	echo "Making ${GENIMAGE_PATH} executable"
 	chmod a+x "${GENIMAGE_PATH}"
@@ -76,7 +76,7 @@ fi
 touch "${IMAGE_DIR}/grub-efi-bootx64.efi"
 
 # Build the image properly
-bash "${REALPATH_BASE_DIR}/embedded_quickstart/genimage.sh" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
+bash "$GENIMAGE_PATH" "${IMAGE_DIR}" "${SYSTEM_NAME}-${VERSION}"
 
 echo "current directory:"
 ls -lah .

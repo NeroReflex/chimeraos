@@ -230,6 +230,16 @@ mkdir -p /efi
 mkdir -p /var/log
 EOF
 
+# pacstrap leaves the gpg-agent running in the background, which prevents us from unmounting the deployment rootfs:
+# we need to kill it before we can unmount.
+readonly pgp_user=$(ps aux | grep $deployment_rootfs_dir | grep "gpg-agent" | head -n 1 | awk '{print $2}')
+if [ -n "$pgp_user" ]; then
+    echo "Found gpg-agent process with PID: $pgp_user, killing it..."
+    kill -9 "$pgp_user"
+else
+    echo "No gpg-agent process found for deployment rootfs: $deployment_rootfs_dir"
+fi
+
 # copy files into chroot again
 cp -R rootfs/. ${BUILD_PATH}/
 rm -rf ${BUILD_PATH}/extra_certs
