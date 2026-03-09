@@ -30,5 +30,5 @@ if [ -f "$deployment_rootfs_dir/usr/$KERNEL_FILE" ]; then
     ln "$deployment_rootfs_dir/usr/$KERNEL_FILE" "$deployment_rootfs_dir/boot/bzImage"
 else
     echo "No kernel file found in ${deployment_rootfs_dir}/usr"
-    exit 1
+    exit -1
 fi
