@@ -79,8 +79,11 @@ readonly UNCOMPRESSED_IMG_PATH="${IMAGE_DIR}/${UNCOMPRESSED_IMG_FILENAME}"
 # this is used in embuer-script.sh to find the rootfs tarball
 export BINARIES_DIR="${IMAGE_DIR}"
 
+# Convert SIZE from manifest (e.g., "12000MB") to GiB for embuer-installer
+SIZE_IN_GB=$(echo "${SIZE}" | sed 's/MB$//' | awk '{printf "%.0f", $1/1024}')
+
 # The deployment subvolume is made read-only by the embuer-installer executable when we are finished
-embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh"
+embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --image-size "${SIZE_IN_GB}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh"
 
 echo "current directory:"
 ls -lah .
