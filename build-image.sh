@@ -80,7 +80,7 @@ readonly UNCOMPRESSED_IMG_PATH="${IMAGE_DIR}/${UNCOMPRESSED_IMG_FILENAME}"
 export BINARIES_DIR="${IMAGE_DIR}"
 
 # The deployment subvolume is made read-only by the embuer-installer executable when we are finished
-./target/debug/embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh"
+embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh"
 
 echo "current directory:"
 ls -lah .
