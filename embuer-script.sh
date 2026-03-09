@@ -24,6 +24,16 @@ echo "    \"version\": \"$deployment_name\"," >> $deployment_rootfs_dir/usr/shar
 echo "    \"readonly\": true" >> $deployment_rootfs_dir/usr/share/embuer/manifest.json
 echo "}" >> $deployment_rootfs_dir/usr/share/embuer/manifest.json
 
+if [ -d "$deployment_rootfs_dir/usr/lib" ]; then
+    ls -lah "$deployment_rootfs_dir/usr/lib"
+fi
+
+if [ -d "$deployment_rootfs_dir/usr/lib/modules" ]; then
+    ls -lah "$deployment_rootfs_dir/usr/lib/modules"
+fi
+
+find "$deployment_rootfs_dir/usr" -name "vmlinu*"
+
 readonly KERNEL_FILE=$(find "$deployment_rootfs_dir/usr" -name "vmlinu*" | head -n 1)
 if [ -f "$deployment_rootfs_dir/usr/$KERNEL_FILE" ]; then
     echo "Found kernel file '${$deployment_rootfs_dir/usr/$KERNEL_FILE}': making it bootable"
