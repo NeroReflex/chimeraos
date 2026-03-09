@@ -14,7 +14,6 @@ if [ -f "${ROOTFS_TAR_FILE}" ]; then
     tar xpf "${ROOTFS_TAR_FILE}" -C "${deployment_rootfs_dir}"
 else
     echo "No tar rootfs found."
-    dismantle
     exit -1
 fi
 
