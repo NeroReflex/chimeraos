@@ -83,27 +83,12 @@ export BINARIES_DIR="${IMAGE_DIR}"
 SIZE_IN_GB=$(echo "${SIZE}" | sed 's/MB$//' | awk '{printf "%.0f", $1/1024}')
 
 # The deployment subvolume is made read-only by the embuer-installer executable when we are finished
-embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --image-size "${SIZE_IN_GB}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh"
+embuer-installer -i "${UNCOMPRESSED_IMG_PATH}" --image-size "${SIZE_IN_GB}" --arch "amd64" --bootloader "refind" --deployment-name "${SYSTEM_NAME}_${VERSION}" --deployment-source "manual" --manual-script "./embuer-script.sh" --generate-deployment "${OUTPUT_DIR}"
 
-echo "current directory:"
-ls -lah .
+# Generate the update package for the deployment
+embuer-genupdate --private-key-pem private_key.pem --path "${OUTPUT_DIR}"
 
-# BTRFS rootfs subvolume
-readonly SUBVOLUME_FILE=$(find "${OUTPUT_DIR}" -name '*.btrfs.xz' 2>/dev/null | head -n1)
-if [ ! -f "${SUBVOLUME_FILE}" ]; then
-	echo "No BTRFS subvolume file found in ${IMAGE_DIR}"
-	exit 1
-fi
-
-# Update package filename
-readonly UPDATE_FILE=$(find "${OUTPUT_DIR}" -name 'update_package.tar' 2>/dev/null | head -n1)
-if [ ! -f "${UPDATE_FILE}" ]; then
-	echo "No update file found in ${IMAGE_DIR}"
-	exit 1
-fi
-
-echo "Binary dir"
-ls -lah ${IMAGE_DIR}
+readonly UPDATE_FILE="${OUTPUT_DIR}/update_package.tar"
 
 safe_mv "${UNCOMPRESSED_IMG_PATH}" "${UNCOMPRESSED_IMG_FILENAME}"
 
