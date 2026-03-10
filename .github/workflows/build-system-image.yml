@@ -90,6 +90,9 @@ jobs:
       - name: Clean debs to free space
         run: |
           sudo rm *.deb
+      - name: Populate private key from github secrets
+        run: |
+          echo "${{ secrets.SIGNING_KEY }}" > private_key.pem
       - name: Build system image
         id: build_image
         env:
