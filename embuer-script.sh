@@ -19,12 +19,28 @@ else
     exit -1
 fi
 
-# Create the manifest file for the deployment.
-mkdir -p $deployment_rootfs_dir/usr/share/embuer
-echo "{" > $deployment_rootfs_dir/usr/share/embuer/manifest.json
-echo "    \"version\": \"$deployment_name\"," >> $deployment_rootfs_dir/usr/share/embuer/manifest.json
-echo "    \"readonly\": true" >> $deployment_rootfs_dir/usr/share/embuer/manifest.json
-echo "}" >> $deployment_rootfs_dir/usr/share/embuer/manifest.json
+# Copy the public key file
+cp -v public_key_pkcs1.pem "${deployment_rootfs_dir}/usr/share/embuer/"
+
+# Create the settings file
+readonly SETTINGS_FILE_PATH="${deployment_rootfs_dir}/usr/share/embuer/config.json"
+mkdir -p "${deployment_rootfs_dir}/usr/share/embuer/"
+echo "{" > "${SETTINGS_FILE_PATH}"
+echo "  \"update_url\": \"http://65.21.79.97/update_package.tar\"," >> "${SETTINGS_FILE_PATH}"
+echo "  \"auto_install_updates\": false," >> "${SETTINGS_FILE_PATH}"
+echo "" >> "${SETTINGS_FILE_PATH}"
+echo "  \"rootfs_dir\": \"/mnt\"," >> "${SETTINGS_FILE_PATH}"
+echo "" >> "${SETTINGS_FILE_PATH}"
+echo "  \"public_key_pem\": \"/usr/share/embuer/public_key_pkcs1.pem\"" >> "${SETTINGS_FILE_PATH}"
+echo "}" >> "${SETTINGS_FILE_PATH}"
+
+# Create the manifest file for the deployment
+mkdir -p "${deployment_rootfs_dir}/usr/share/embuer"
+readonly MANIFEST_FILE_PATH="${deployment_rootfs_dir}/usr/share/embuer/manifest.json"
+echo "{" > "${MANIFEST_FILE_PATH}"
+echo "    \"version\": \"$deployment_name\"," >> "${MANIFEST_FILE_PATH}"
+echo "    \"readonly\": true" >> "${MANIFEST_FILE_PATH}"
+echo "}" >> "${MANIFEST_FILE_PATH}"
 
 find "$deployment_rootfs_dir/usr" -name "vmlinu*"
 

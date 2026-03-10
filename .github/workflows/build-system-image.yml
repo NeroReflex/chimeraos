@@ -84,9 +84,12 @@ jobs:
           sudo apt-get install -y btrfs-progs dosfstools mtools parted libelf-dev efitools libnss3-tools pesign mount efitools libnss3-tools
       - name: Install embuer
         run: |
-          wget https://github.com/NeroReflex/embuer/releases/download/0.2.20/embuer_0.2.20-1_amd64.trixie.deb
-          sudo dpkg -i embuer_0.2.20-1_amd64.trixie.deb
+          wget https://github.com/NeroReflex/embuer/releases/download/0.2.23/embuer_0.2.23-1_amd64.trixie.deb
+          sudo dpkg -i embuer_0.2.23-1_amd64.trixie.deb
           sudo apt-get --fix-broken install -y
+      - name: Clean debs to free space
+        run: |
+          sudo rm *.deb
       - name: Build system image
         id: build_image
         env:
