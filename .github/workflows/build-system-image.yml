@@ -103,6 +103,9 @@ jobs:
           TAGS="${{ steps.meta.outputs.tags }}"
           FIRST_TAG="$(printf '%s\n' "$TAGS" | head -n1)"
           sudo env GITHUB_OUTPUT="${GITHUB_OUTPUT:-}" OUTPUT_DIR="${OUTPUT_DIR}" bash build-image.sh "$FIRST_TAG"
+      - name: Remove private key
+        run: |
+          rm -f private_key.pem
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:
