@@ -90,14 +90,10 @@ embuer-genupdate --private-key-pem private_key.pem --path "${OUTPUT_DIR}"
 
 readonly UPDATE_FILE="${OUTPUT_DIR}/update_package.tar"
 
-safe_mv "${UNCOMPRESSED_IMG_PATH}" "${UNCOMPRESSED_IMG_FILENAME}"
-
 # cleanup any leftover rootfs tars
 rm -f ${IMAGE_DIR}/*rootfs*.tar*
 
-# compress the resulting image
-xz -9e --threads=0 "${UNCOMPRESSED_IMG_FILENAME}"
-readonly IMG_FILENAME="${UNCOMPRESSED_IMG_FILENAME}.xz"
+readonly IMG_FILENAME="${UNCOMPRESSED_IMG_PATH}"
 
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 sha256sum "$UPDATE_FILE" >> sha256sum.txt
