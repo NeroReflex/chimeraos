@@ -84,16 +84,9 @@ jobs:
           sudo apt-get install -y btrfs-progs dosfstools mtools parted libelf-dev efitools libnss3-tools pesign mount efitools libnss3-tools
       - name: Install embuer
         run: |
-          wget https://github.com/NeroReflex/embuer/releases/download/0.2.19/embuer_0.2.19-1_amd64.trixie.deb
-          sudo dpkg -i embuer_0.2.19-1_amd64.trixie.deb
+          wget https://github.com/NeroReflex/embuer/releases/download/0.2.20/embuer_0.2.20-1_amd64.trixie.deb
+          sudo dpkg -i embuer_0.2.20-1_amd64.trixie.deb
           sudo apt-get --fix-broken install -y
-      - name: Clone embedded_quickstart
-        run: |
-          git clone https://github.com/NeroReflex/embedded_quickstart.git
-          pushd embedded_quickstart
-          git checkout scarthgap
-          chmod a+x genimage.sh
-          popd
       - name: Build system image
         id: build_image
         env:

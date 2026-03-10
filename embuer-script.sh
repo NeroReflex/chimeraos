@@ -7,6 +7,8 @@ readonly deployment_name="$1"
 readonly deployment_rootfs_dir="$2"
 readonly deployment_rootfs_data_dir="$3"
 
+echo "Creating deployment $deployment_name on $deployment_rootfs_dir with data dir $deployment_rootfs_data_dir"
+
 echo "Searching for the rootfs..."
 readonly ROOTFS_TAR_FILE=$(find "${BINARIES_DIR}" -name '*rootfs*.tar*' | head -n 1)
 if [ -f "${ROOTFS_TAR_FILE}" ]; then
