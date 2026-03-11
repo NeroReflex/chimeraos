@@ -97,10 +97,8 @@ readonly IMG_FILENAME="${UNCOMPRESSED_IMG_PATH}"
 
 sha256sum "$IMG_FILENAME" > sha256sum.txt
 sha256sum "$UPDATE_FILE" >> sha256sum.txt
-sha256sum "$SUBVOLUME_FILE" >> sha256sum.txt
 
 safe_mv "${UPDATE_FILE}" "${OUTPUT_DIR}"
-safe_mv "${SUBVOLUME_FILE}" "${OUTPUT_DIR}"
 safe_mv "${IMG_FILENAME}" "${OUTPUT_DIR}"
 safe_mv "${IMAGE_DIR}/build_info.txt" "${OUTPUT_DIR}"
 safe_mv "build_info.txt" "${OUTPUT_DIR}"
