@@ -106,12 +106,18 @@ jobs:
       - name: Remove private key
         run: |
           rm -f private_key.pem
+      - name: Normalize artifact permissions
+        run: |
+          sudo chown -R "$USER:$USER" output || true
+          sudo find output -type d -exec chmod 755 {} + || true
+          sudo find output -type f -exec chmod 644 {} + || true
       - name: Upload Package Archives
         uses: actions/upload-artifact@v4
         with:
             name: release-packages
             compression-level: 0
+            if-no-files-found: error
             path: |
-              output/${{ steps.build_rootfs.outputs.rootfs }}
-              output/*.img
+              output/${{ steps.build_image.outputs.update_filename }}
+              output/${{ steps.build_image.outputs.disk_image_filename }}
               output/*.txt
