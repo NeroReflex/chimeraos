@@ -63,6 +63,23 @@ echo "overlay /etc  overlay rw${RDTAB_MOUNTED},noatime,x-initrd.mount,defaults,x
 echo "overlay /var  overlay rw${RDTAB_MOUNTED},noatime,x-initrd.mount,defaults,x-systemd.requires-mounts-for=/mnt,x-systemd.rw-only,lowerdir=/var,upperdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${deployment_name}/var_overlay/upperdir,workdir=/mnt/${DEPLOYMENTS_DATA_DIR}/${deployment_name}/var_overlay/workdir,index=off,metacopy=off,xino=off,redirect_dir=off,uuid=null    0  0" >> "${deployment_rootfs_dir}/etc/fstab"
 
 ################################################################################################
+# If atomrootfsinit exists use that as the init system, otherwise use systemd
+################################################################################################
+
+if [ -f "${deployment_rootfs_dir}/usr/bin/atomrootfsinit" ]; then
+    echo "Using atomrootfsinit as the init system"
+    rm -f "${deployment_rootfs_dir}/init"
+    ln -s /usr/bin/atomrootfsinit "${deployment_rootfs_dir}/init"
+else
+    if [ -f "${deployment_rootfs_dir}/init" ]; then
+        echo "Using the default init system"
+    else
+        echo "No init system found, exiting"
+        exit -1
+    fi
+fi
+
+################################################################################################
 # Complete the deployment by adding the public key, the settings file and the manifest file
 ################################################################################################
 
