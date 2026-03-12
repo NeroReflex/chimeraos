@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-set -eu pipefail
+#set -eu pipefail
 
 # Make embuer-specific changes to the image to make it a valid and bootable deployment.
 # It can be executed by embuer-installer whith the --manual-script option.
