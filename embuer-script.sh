@@ -68,8 +68,7 @@ echo "overlay /var  overlay rw${RDTAB_MOUNTED},noatime,x-initrd.mount,defaults,x
 
 if [ -f "${deployment_rootfs_dir}/usr/bin/atomrootfsinit" ]; then
     echo "Using atomrootfsinit as the init system"
-    rm -f "${deployment_rootfs_dir}/init"
-    ln -s /usr/bin/atomrootfsinit "${deployment_rootfs_dir}/init"
+    ln -sf /usr/bin/atomrootfsinit "${deployment_rootfs_dir}/usr/bin/init"
 else
     if [ -f "${deployment_rootfs_dir}/init" ]; then
         echo "Using the default init system"
