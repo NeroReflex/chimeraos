@@ -78,6 +78,11 @@ else
     fi
 fi
 
+if [ -f "${deployment_rootfs_dir}/usr/lib/systemd/systemd" ]; then
+    echo "Using preinstalled systemd as the init system"
+    echo "/usr/lib/systemd/systemd" > "${deployment_rootfs_dir}/etc/rdexec"
+fi
+
 ################################################################################################
 # Complete the deployment by adding the public key, the settings file and the manifest file
 ################################################################################################
