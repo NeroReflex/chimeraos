@@ -22,6 +22,31 @@ else
 fi
 
 ################################################################################################
+# If polyauth is present configure pam to use it for authentication
+################################################################################################
+
+if [ -f "${deployment_rootfs_dir}/etc/pam.d/system-auth" ] && [ -f "${deployment_rootfs_dir}/usr/lib/security/pam_polyauth.so" ]; then
+    echo "Found polyauth, configuring PAM..."
+
+    sed -n '/^[[:space:]]*auth[[:space:]]/=' "${deployment_rootfs_dir}/etc/pam.d/system-auth" | tail -1 |   { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\-auth     sufficient pam_login_ng.so" "${deployment_rootfs_dir}/etc/pam.d/system-auth"; fi; }
+
+    # TODO:
+
+# sed -n '/^[[:space:]]*account[[:space:]]/=' file | tail -1 | \
+#  { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\\
+#-account  sufficient pam_login_ng.so" file; fi; }
+
+
+#sed -n '/^[[:space:]]*session[[:space:]]/=' file | tail -1 | \
+#  { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\\
+#-session  optional   pam_login_ng.so" file; fi; }
+
+
+else
+    echo "No polyauth found, skipping PAM configuration"
+fi
+
+################################################################################################
 # Create the two files /etc/rdtab and /etc/fstab to make the deployment usable
 ################################################################################################
 
