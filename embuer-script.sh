@@ -29,18 +29,8 @@ if [ -f "${deployment_rootfs_dir}/etc/pam.d/system-auth" ] && [ -f "${deployment
     echo "Found polyauth, configuring PAM..."
 
     sed -n '/^[[:space:]]*auth[[:space:]]/=' "${deployment_rootfs_dir}/etc/pam.d/system-auth" | tail -1 |   { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\-auth     sufficient pam_login_ng.so" "${deployment_rootfs_dir}/etc/pam.d/system-auth"; fi; }
-
-    # TODO:
-
-# sed -n '/^[[:space:]]*account[[:space:]]/=' file | tail -1 | \
-#  { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\\
-#-account  sufficient pam_login_ng.so" file; fi; }
-
-
-#sed -n '/^[[:space:]]*session[[:space:]]/=' file | tail -1 | \
-#  { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\\
-#-session  optional   pam_login_ng.so" file; fi; }
-
+    sed -n '/^[[:space:]]*account[[:space:]]/=' "${deployment_rootfs_dir}/etc/pam.d/system-auth" | tail -1 |  { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\\ -account  sufficient pam_login_ng.so" "${deployment_rootfs_dir}/etc/pam.d/system-auth"; fi; }
+    sed -n '/^[[:space:]]*session[[:space:]]/=' "${deployment_rootfs_dir}/etc/pam.d/system-auth" | tail -1 | { read l; if [ -n "$l" ]; then sed -i.bak "$((l))a\\-session  optional   pam_login_ng.so" "${deployment_rootfs_dir}/etc/pam.d/system-auth"; fi; }
 
 else
     echo "No polyauth found, skipping PAM configuration"
