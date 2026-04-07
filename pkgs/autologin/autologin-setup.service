@@ -1,0 +1,12 @@
+[Unit]
+Description=Prepare autologin at first boot
+Wants=greetd.service
+Before=greetd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/autologin-firstboot.sh user
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
